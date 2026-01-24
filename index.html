@@ -3,283 +3,531 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Qwen Turbo Voice</title>
+    <title>Live Stream - Friends Connect</title>
+    <!-- PeerJS Library untuk WebRTC -->
+    <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
+    <!-- Font Awesome untuk Ikon -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
-        /* STYLE QWEN DARK */
         :root {
-            --bg-color: #000;
-            --primary: #10a37f;
-            --accent: #00f0ff;
-            --speaking: #10a37f;
-            --text-main: #ffffff;
-            --text-sub: #666;
+            --primary: #2D8CFF;
+            --bg-dark: #121212;
+            --panel-bg: rgba(30, 30, 30, 0.85);
+            --danger: #FF4B4B;
+            --text: #ffffff;
         }
 
-        body, html {
-            margin: 0; padding: 0; width: 100%; height: 100%;
-            background-color: var(--bg-color);
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-            color: var(--text-main);
-            display: flex; flex-direction: column; overflow: hidden;
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
         }
 
-        /* START OVERLAY */
-        #start-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.95); z-index: 999;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text);
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
         }
 
-        .btn-start {
-            padding: 20px 50px; font-size: 1.5rem; background: var(--primary); color: white;
-            border: none; border-radius: 50px; cursor: pointer; text-transform: uppercase;
-            letter-spacing: 2px; font-weight: bold;
-            box-shadow: 0 0 30px rgba(16, 163, 127, 0.5);
-            animation: pulse-green 2s infinite;
+        /* --- Halaman Login --- */
+        #login-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            z-index: 100;
         }
 
-        /* STAGE UTAMA */
-        #stage { flex: 1; position: relative; display: flex; align-items: center; justify-content: center; }
+        .login-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 2rem;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+
+        .login-card h2 { margin-bottom: 1.5rem; }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 1rem;
+            border-radius: 8px;
+            border: 1px solid #444;
+            background: rgba(0,0,0,0.3);
+            color: white;
+            font-size: 1rem;
+        }
+
+        button.primary-btn {
+            width: 100%;
+            padding: 12px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        button.primary-btn:hover { background: #1b6dd6; }
+
+        /* --- Halaman Video Call --- */
+        #video-container {
+            flex: 1;
+            position: relative;
+            display: none; /* Hidden by default */
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Video Remote (Teman) */
+        #remote-video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            background: #000;
+        }
+
+        /* Video Local (Saya) - Picture in Picture style */
+        #local-video {
+            position: absolute;
+            bottom: 100px;
+            right: 20px;
+            width: 120px;
+            height: 160px;
+            background: #222;
+            border-radius: 12px;
+            object-fit: cover;
+            border: 2px solid rgba(255,255,255,0.2);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            transition: all 0.3s ease;
+            z-index: 10;
+        }
+
+        /* Status jika belum ada koneksi */
+        .placeholder-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            color: #aaa;
+            z-index: 1;
+        }
+
+        /* --- Controls Bar --- */
+        .controls {
+            height: 80px;
+            background: var(--panel-bg);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 0 1rem;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            backdrop-filter: blur(5px);
+            z-index: 50;
+        }
+
+        .control-btn {
+            background: rgba(255,255,255,0.15);
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: 0.2s;
+        }
+
+        .control-btn:hover { background: rgba(255,255,255,0.3); }
+        .control-btn.active-off { background: var(--danger); }
+        .control-btn.end-call { background: var(--danger); width: 60px; height: 60px; }
+
+        /* --- Chat Panel --- */
+        #chat-panel {
+            position: absolute;
+            top: 0;
+            right: -100%; /* Hidden */
+            width: 80%;
+            max-width: 320px;
+            height: calc(100% - 80px);
+            background: rgba(20, 20, 20, 0.95);
+            z-index: 60;
+            transition: right 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            border-left: 1px solid #333;
+        }
+
+        #chat-panel.open { right: 0; }
+
+        .chat-header {
+            padding: 15px;
+            border-bottom: 1px solid #333;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        #chat-messages {
+            flex: 1;
+            padding: 15px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .message {
+            background: #333;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            max-width: 80%;
+        }
+
+        .message.mine {
+            background: var(--primary);
+            align-self: flex-end;
+        }
+
+        .message.theirs {
+            background: #444;
+            align-self: flex-start;
+        }
+
+        .chat-input-area {
+            padding: 10px;
+            display: flex;
+            border-top: 1px solid #333;
+        }
+
+        .chat-input-area input {
+            margin: 0;
+            padding: 10px;
+        }
         
-        /* CORE VISUALIZER */
-        .core {
-            width: 180px; height: 180px; border-radius: 50%;
-            background: #1a1a1a; border: 2px solid #333;
-            display: flex; align-items: center; justify-content: center;
-            position: relative; transition: all 0.2s;
-            box-shadow: 0 0 20px rgba(0,0,0,0.5);
-        }
-        .core svg { width: 60px; height: 60px; fill: #555; transition: fill 0.2s; }
-
-        /* STATES */
-        .core.listening { border-color: var(--accent); box-shadow: 0 0 40px rgba(0, 240, 255, 0.2); }
-        .core.listening svg { fill: var(--accent); animation: breathe 2s infinite; }
-
-        .core.thinking { border-color: #ffd700; transform: scale(1.1); }
-        .core.thinking svg { fill: #ffd700; animation: spin 0.5s linear infinite; }
-
-        .core.speaking { border-color: var(--primary); box-shadow: 0 0 50px rgba(16, 163, 127, 0.6); transform: scale(1.05); }
-        .core.speaking svg { fill: var(--primary); }
-
-        /* TEXT LOG */
-        #log-display {
-            position: absolute; bottom: 100px; width: 100%; text-align: center;
-            font-size: 1.2rem; color: #888; font-weight: 500; min-height: 30px;
+        .chat-send {
+            background: var(--primary);
+            border: none;
+            color: white;
+            padding: 0 15px;
+            border-radius: 8px;
+            margin-left: 5px;
         }
 
-        /* SETTINGS */
-        #modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 1000; display: none; align-items: center; justify-content: center; }
-        .modal-box { background: #222; padding: 25px; border-radius: 10px; width: 300px; border: 1px solid #444; text-align: center; }
-        .api-input { width: 100%; padding: 10px; background: #111; border: 1px solid #444; color: white; border-radius: 5px; margin: 10px 0; box-sizing: border-box; }
-        .btn-save { background: var(--primary); color: white; border: none; padding: 10px; width: 100%; border-radius: 5px; cursor: pointer; font-weight: bold; }
-
-        @keyframes pulse-green { 0% { box-shadow: 0 0 0 0 rgba(16,163,127,0); } 70% { box-shadow: 0 0 30px rgba(16,163,127,0); } 100% { box-shadow: 0 0 0 0 rgba(16,163,127,0); } }
-        @keyframes breathe { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
-        @keyframes spin { 100% { transform: rotate(360deg); } }
-
+        /* --- Room Info Popup --- */
+        #room-info {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.6);
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            pointer-events: none;
+            z-index: 20;
+            display: none;
+        }
     </style>
 </head>
 <body>
 
-    <div id="start-overlay">
-        <button class="btn-start" onclick="startApp()">MULAI CEPAT</button>
-        <div style="color:#666; margin-top:15px;">Mode Suara Turbo - Tanpa Delay</div>
-    </div>
-
-    <div id="stage">
-        <div class="core" id="visual-core">
-            <svg viewBox="0 0 24 24">
-                <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
-                <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
-                <line x1="12" y1="19" x2="12" y2="23"></line>
-                <line x1="8" y1="23" x2="16" y2="23"></line>
-            </svg>
+    <!-- 1. LOGIN SCREEN -->
+    <div id="login-screen">
+        <div class="login-card">
+            <h2><i class="fas fa-video"></i> Live Connect</h2>
+            <p style="margin-bottom: 20px; color: #ccc;">Masukkan nama Anda</p>
+            <input type="text" id="username-input" placeholder="Nama Anda">
+            
+            <p style="margin-top: 15px; margin-bottom: 5px; color: #ccc;">Buat / Masuk Room ID</p>
+            <input type="text" id="room-id-input" placeholder="Contoh: rahasia123">
+            
+            <button class="primary-btn" onclick="joinRoom()">Masuk Ruangan</button>
+            <p style="font-size: 0.8rem; margin-top: 15px; color: #888;">Bagikan Room ID ke teman agar mereka bisa bergabung.</p>
         </div>
     </div>
 
-    <div id="log-display">Menunggu...</div>
+    <!-- 2. VIDEO CALL SCREEN -->
+    <div id="video-container">
+        <div id="room-info">Room ID: <span id="display-room-id"></span> (Salin ini)</div>
+        
+        <div class="placeholder-text" id="status-msg">
+            <i class="fas fa-user-friends fa-3x"></i><br>
+            Menunggu teman masuk...
+        </div>
 
-    <div id="modal">
-        <div class="modal-box">
-            <h3>Pengaturan</h3>
-            <input type="password" id="api-key" class="api-input" placeholder="Groq API Key (gsk_...)">
-            <button class="btn-save" onclick="saveSettings()">SIMPAN</button>
-            <div onclick="document.getElementById('modal').style.display='none'" style="margin-top:10px; cursor:pointer; color:#666;">Tutup</div>
+        <!-- Video Teman -->
+        <video id="remote-video" autoplay playsinline></video>
+        
+        <!-- Video Saya -->
+        <video id="local-video" autoplay muted playsinline></video>
+    </div>
+
+    <!-- 3. CONTROLS -->
+    <div class="controls" id="controls" style="display: none;">
+        <button class="control-btn" onclick="toggleChat()">
+            <i class="fas fa-comment"></i>
+        </button>
+        <button class="control-btn" id="btn-mic" onclick="toggleMic()">
+            <i class="fas fa-microphone"></i>
+        </button>
+        <button class="control-btn end-call" onclick="endCall()">
+            <i class="fas fa-phone-slash"></i>
+        </button>
+        <button class="control-btn" id="btn-cam" onclick="toggleCam()">
+            <i class="fas fa-video"></i>
+        </button>
+    </div>
+
+    <!-- 4. CHAT PANEL -->
+    <div id="chat-panel">
+        <div class="chat-header">
+            <span>Chat Room</span>
+            <span onclick="toggleChat()" style="cursor:pointer"><i class="fas fa-times"></i></span>
+        </div>
+        <div id="chat-messages">
+            <!-- Pesan akan muncul di sini -->
+        </div>
+        <div class="chat-input-area">
+            <input type="text" id="msg-input" placeholder="Ketik pesan...">
+            <button class="chat-send" onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button>
         </div>
     </div>
 
     <script>
-        /* --- ENGINE: TURBO SPEED --- */
-        
-        // 1. CONFIG
-        const API_URL = 'https://api.groq.com/openai/v1/chat/completions';
-        const MODEL = 'llama-3.3-70b-versatile'; // Model yang sangat cepat
-        const SPEECH_RATE = 1.2; // 1.2x Lebih Cepat dari normal (1.0)
-        
-        let API_KEY = localStorage.getItem('qwen_turbo_key') || '';
-        let chatHistory = [];
-        let isActive = false;
+        // --- Variabel Global ---
+        let peer;
+        let myStream;
+        let currentCall;
+        let dataConnection; // Untuk chat
+        let isMicOn = true;
+        let isCamOn = true;
+        let myName = "User";
 
-        // DOM
-        const core = document.getElementById('visual-core');
-        const log = document.getElementById('log-display');
-        const modal = document.getElementById('modal');
-        const keyInput = document.getElementById('api-key');
+        // Elemen DOM
+        const loginScreen = document.getElementById('login-screen');
+        const videoContainer = document.getElementById('video-container');
+        const localVideo = document.getElementById('local-video');
+        const remoteVideo = document.getElementById('remote-video');
+        const statusMsg = document.getElementById('status-msg');
+        const controls = document.getElementById('controls');
+        const roomIdInput = document.getElementById('room-id-input');
+        const usernameInput = document.getElementById('username-input');
+        const displayRoomId = document.getElementById('display-room-id');
 
-        if (!API_KEY) modal.style.display = 'flex';
-        else keyInput.value = API_KEY;
+        // --- 1. Inisialisasi PeerJS ---
+        function initPeer(customId = null) {
+            // Jika customId ada, kita gunakan ID tersebut (bergabung ke room)
+            // Jika tidak, PeerJS akan membuat ID random (membuat room baru)
+            peer = new Peer(customId, {
+                debug: 2
+            });
 
-        // 2. VOICE ENGINE (SPEED TUNED)
-        const synth = window.speechSynthesis;
-        let bestVoice = null;
-
-        function loadVoice() {
-            const v = synth.getVoices();
-            const idV = v.filter(x => x.lang === 'id-ID');
-            if (idV.length > 0) bestVoice = idV[0];
-        }
-        if (speechSynthesis.onvoiceschanged) speechSynthesis.onvoiceschanged = loadVoice;
-        loadVoice();
-
-        function speak(text) {
-            if (synth.speaking) synth.cancel();
-            const u = new SpeechSynthesisUtterance(text);
-            if (bestVoice) u.voice = bestVoice;
-            
-            // PENGATURAN KECEPATAN (TURBO)
-            u.pitch = 1.1; // Sedikit tinggi biar jelas walaupun cepat
-            u.rate = SPEECH_RATE; // CEPAT (1.2x)
-            
-            synth.speak(u);
-        }
-
-        // 3. LISTENING ENGINE
-        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-        const recognition = new SpeechRecognition();
-        recognition.continuous = false;
-        recognition.lang = 'id-ID';
-        recognition.interimResults = false;
-
-        recognition.onstart = () => { setVisual('listening'); };
-        recognition.onend = () => { /* Jangan lakukan apa-apa di sini, biarkan 'process' yang handle flow */ };
-        
-        recognition.onresult = (e) => {
-            const text = e.results[0][0].transcript;
-            if (!text) return;
-            
-            log.innerText = "Kamu: " + text;
-            processAI(text);
-        };
-
-        // 4. LOGIC & FLOW (TANPA DELAY)
-        async function processAI(text) {
-            if (!API_KEY) {
-                log.innerText = "Error: Masukkan API Key dulu.";
-                modal.style.display = 'flex';
-                setVisual('idle');
-                return;
-            }
-
-            setVisual('thinking');
-            chatHistory.push({ role: "user", content: text });
-            chatHistory.push({ role: "assistant", content: "..." }); // Placeholder biar gantian
-
-            const payload = [
-                { role: "system", content: "Kamu AI yang super cepat, ringkas, dan to the point." },
-                ...chatHistory.slice(-10)
-            ];
-
-            try {
-                const res = await fetch(API_URL, {
-                    method: 'POST',
-                    headers: { 'Authorization': `Bearer ${API_KEY}`, 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ messages: payload, model: MODEL, temperature: 0.5 })
-                });
-                const data = await res.json();
-                
-                if (data.choices && data.choices.length > 0) {
-                    const reply = data.choices[0].message.content;
-                    
-                    // Update History
-                    chatHistory[chatHistory.length-1] = { role: "assistant", content: reply };
-                    
-                    log.innerText = reply;
-                    speak(reply);
-                    setVisual('speaking');
+            peer.on('open', (id) => {
+                console.log('My Peer ID is: ' + id);
+                // Jika kita membuat room baru (ID random), tampilkan ID agar bisa dibagikan
+                if (!customId) {
+                    displayRoomId.innerText = id;
+                    document.getElementById('room-info').style.display = 'block';
+                    alert("Room Baru Dibuat! Salin ID ini: " + id);
                 } else {
-                    throw new Error("No response");
+                    displayRoomId.innerText = customId;
+                    document.getElementById('room-info').style.display = 'block';
+                    // Jika bergabung, panggil host (disini asumsi host adalah ID yg kita cari)
+                    // Note: Untuk multi-user kompleks butuh server signaling. 
+                    // Versi ini adalah Peer-to-Peer 1 lawan 1 atau logic sederhana.
                 }
-            } catch (err) {
-                log.innerText = "Error: " + err.message;
-                setVisual('idle');
-                startListening(); // Retry if error
-            }
+            });
+
+            // Saat ada panggilan masuk
+            peer.on('call', (call) => {
+                statusMsg.style.display = 'none';
+                // Jawab panggilan dengan stream kita
+                call.answer(myStream);
+                
+                currentCall = call;
+                
+                // Tampilkan stream lawan
+                call.on('stream', (remoteStream) => {
+                    remoteVideo.srcObject = remoteStream;
+                });
+
+                call.on('close', () => {
+                    endCallUI();
+                });
+            });
+
+            // Saat ada koneksi data masuk (Chat)
+            peer.on('connection', (conn) => {
+                setupDataConnection(conn);
+            });
+
+            peer.on('error', (err) => {
+                alert("Error: " + err.type);
+                console.error(err);
+            });
         }
 
-        // VISUAL STATE MANAGER
-        function setVisual(state) {
-            core.className = 'core'; // Reset
-            if (state === 'listening') {
-                core.classList.add('listening');
-            } else if (state === 'thinking') {
-                core.classList.add('thinking');
-            } else if (state === 'speaking') {
-                core.classList.add('speaking');
-            } else {
-                // Idle
-            }
-        }
-
-        function startApp() {
-            document.getElementById('start-overlay').style.display = 'none';
-            isActive = true;
-            startListening();
-        }
-
-        function startListening() {
-            if (!isActive) return;
-            try { recognition.start(); } catch(e) {}
-        }
-
-        function speak(text) {
-            // Saat AI bicara, matikan mic biar gak noise
-            try { recognition.stop(); } catch(e) {}
-            speak(text);
-        }
-
-        // EVENT HANDLERS
-        // Override fungsi speak bawaan dengan logika flow otomatis
-        const originalSpeak = window.speechSynthesis.prototype.speak;
-        window.speechSynthesis.prototype.speak = function(utterance) {
-            originalSpeak.call(this, utterance);
+        // --- 2. Fungsi Bergabung ---
+        async function joinRoom() {
+            const room = roomIdInput.value.trim();
+            const name = usernameInput.value.trim();
             
-            // KUNCI KECEPATAN: Selesai bicara -> Langsung dengar (Delay 0ms)
-            utterance.onend = function() {
-                log.innerText = ""; // Clear text biar fokus ke dengar
-                setTimeout(startListening, 0); // TANPA DELAY!
-            };
-        };
+            if(!name) { alert("Masukkan nama!"); return; }
+            myName = name;
 
-        function saveSettings() {
-            const k = keyInput.value.trim();
-            if(k) {
-                API_KEY = k;
-                localStorage.setItem('qwen_turbo_key', k);
-                modal.style.display = 'none';
-                if(!isActive) startApp();
+            // Akses Kamera & Mic
+            try {
+                myStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+                localVideo.srcObject = myStream;
+
+                // Masuk ke UI Video
+                loginScreen.style.display = 'none';
+                videoContainer.style.display = 'block';
+                controls.style.display = 'flex';
+
+                // Logika Peer
+                if (room) {
+                    // Mode Join: Kita mencoba connect ke peer ID 'room'
+                    // Di aplikasi nyata, Room ID biasanya map ke User ID Host. 
+                    // Di sini kita asumsikan room ID adalah ID Peer Host.
+                    initPeer(); // Buat ID random untuk kita dulu
+                    peer.on('open', (id) => {
+                        connectToPeer(room);
+                    });
+                } else {
+                    // Mode Host: Buat Room baru
+                    initPeer(); 
+                }
+
+            } catch (err) {
+                alert("Gagal mengakses kamera/mic: " + err.message);
             }
         }
 
-        // Klik Core untuk manual toggle (Opsional)
-        core.addEventListener('click', () => {
-            if (isActive && core.classList.contains('listening')) {
-                core.classList.remove('listening');
-                recognition.stop();
-            } else {
-                startListening();
-            }
-        });
+        // --- 3. Hubungkan ke Teman ---
+        function connectToPeer(remotePeerId) {
+            // Panggilan Video
+            const call = peer.call(remotePeerId, myStream);
+            currentCall = call;
+            
+            call.on('stream', (remoteStream) => {
+                statusMsg.style.display = 'none';
+                remoteVideo.srcObject = remoteStream;
+            });
 
+            call.on('close', () => {
+                endCallUI();
+            });
+
+            // Koneksi Data (Chat)
+            const conn = peer.connect(remotePeerId);
+            setupDataConnection(conn);
+        }
+
+        // --- 4. Setup Chat ---
+        function setupDataConnection(conn) {
+            dataConnection = conn;
+
+            conn.on('open', () => {
+                console.log("Data Connection Established");
+            });
+
+            conn.on('data', (data) => {
+                // Terima pesan
+                if (data.type === 'chat') {
+                    appendMessage(data.msg, 'theirs', data.sender);
+                }
+            });
+
+            conn.on('close', () => {
+                dataConnection = null;
+            });
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('msg-input');
+            const msg = input.value.trim();
+            if (!msg || !dataConnection) return;
+
+            // Kirim ke lawan
+            dataConnection.send({ type: 'chat', msg: msg, sender: myName });
+            
+            // Tampilkan di layar kita
+            appendMessage(msg, 'mine');
+            input.value = '';
+        }
+
+        function appendMessage(text, type, senderName = "") {
+            const container = document.getElementById('chat-messages');
+            const div = document.createElement('div');
+            div.className = `message ${type}`;
+            
+            if (type === 'theirs') {
+                div.innerHTML = `<strong>${senderName}:</strong><br>${text}`;
+            } else {
+                div.innerText = text;
+            }
+            
+            container.appendChild(div);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function toggleChat() {
+            document.getElementById('chat-panel').classList.toggle('open');
+        }
+
+        // --- 5. Kontrol Video ---
+        function toggleMic() {
+            isMicOn = !isMicOn;
+            myStream.getAudioTracks()[0].enabled = isMicOn;
+            const btn = document.getElementById('btn-mic');
+            btn.innerHTML = isMicOn ? '<i class="fas fa-microphone"></i>' : '<i class="fas fa-microphone-slash"></i>';
+            if(!isMicOn) btn.classList.add('active-off'); else btn.classList.remove('active-off');
+        }
+
+        function toggleCam() {
+            isCamOn = !isCamOn;
+            myStream.getVideoTracks()[0].enabled = isCamOn;
+            const btn = document.getElementById('btn-cam');
+            btn.innerHTML = isCamOn ? '<i class="fas fa-video"></i>' : '<i class="fas fa-video-slash"></i>';
+            if(!isCamOn) btn.classList.add('active-off'); else btn.classList.remove('active-off');
+        }
+
+        function endCall() {
+            if (currentCall) currentCall.close();
+            if (peer) peer.destroy();
+            endCallUI();
+        }
+
+        function endCallUI() {
+            alert("Panggilan selesai.");
+            window.location.reload();
+        }
     </script>
 </body>
 </html>
