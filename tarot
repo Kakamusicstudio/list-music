@@ -2,149 +2,62 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Live Langsung Masuk</title>
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Live</title>
     <style>
-        :root {
-            --primary: #0ea5e9;
-            --bg: #0f172a;
-        }
-
         * {
-            box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Segoe UI', sans-serif;
+            box-sizing: border-box;
         }
-
         body {
-            background: var(--bg);
-            color: white;
-            height: 100vh;
+            background-color: #000;
             overflow: hidden;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            height: 100vh;
+            width: 100vw;
         }
-
-        /* --- TOMBOL MASUK SEDERHANA --- */
-        #landing-page {
-            text-align: center;
-            transition: opacity 0.5s;
-        }
-
-        h1 {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
-        }
-
-        p {
-            color: #94a3b8;
-            margin-bottom: 30px;
-        }
-
-        .btn-enter {
-            background: var(--primary);
-            color: white;
-            border: none;
-            padding: 15px 40px;
-            font-size: 1.2rem;
-            border-radius: 50px;
-            cursor: pointer;
-            box-shadow: 0 0 20px rgba(14, 165, 233, 0.5);
-            transition: transform 0.2s;
-        }
-
-        .btn-enter:hover {
-            transform: scale(1.05);
-        }
-
-        /* Container Video */
-        #jitsi-container {
-            position: absolute;
-            top: 0;
-            left: 0;
+        /* Iframe langsung full screen */
+        iframe {
             width: 100%;
             height: 100%;
-            display: none; /* Disembunyikan dulu */
-            z-index: 1;
+            border: none;
+        }
+        
+        /* Loading text sederhana */
+        #loading {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-family: sans-serif;
+            font-size: 1.5rem;
+            pointer-events: none;
+            display: none;
         }
     </style>
 </head>
 <body>
 
-    <!-- HALAMAN DEPAN: TOMBOL AJA -->
-    <div id="landing-page">
-        <h1><i class="fas fa-video"></i> Kumpul Online</h1>
-        <p>Siapa pun yang membuka aplikasi ini akan masuk ke ruangan yang sama.</p>
-        <button class="btn-enter" onclick="autoJoin()">MASUK SEKARANG</button>
-    </div>
+    <!-- Iframe Jitsi Langsung -->
+    <!-- Izinkan Kamera, Mic, dan Layar Penuh -->
+    <iframe 
+        src="https://meet.jit.si/TEMAN-NGOBROL-BARENG" 
+        allow="camera; microphone; fullscreen; display-capture; autoplay; clipboard-read; clipboard-write"
+        style="width: 100%; height: 100%;">
+    </iframe>
 
-    <!-- CONTAINER VIDEO -->
-    <div id="jitsi-container"></div>
-
-    <!-- Script Jitsi -->
-    <script src="https://meet.jit.si/external_api.js"></script>
+    <div id="loading">Memuat...</div>
 
     <script>
-        // ========================================
-        // PENGATURAN RUANGAN (BISA DIGANTI DISINI)
-        // ========================================
-        const KODE_RUANGAN_TETAP = "RuangNongkrongBareng"; 
-        // Catatan: Semua orang masuk ke "RuangNongkrongBareng".
-        // Jika ingin ganti ruangan baru, ubah teks di atas lalu simpan file.
-        // ========================================
+        const iframe = document.querySelector('iframe');
+        const loading = document.getElementById('loading');
 
-        function autoJoin() {
-            // 1. Generate Nama Tamu Otomatis (Agar unik)
-            const randomNum = Math.floor(Math.random() * 9000) + 1000;
-            const namaTamu = "Tamu-" + randomNum;
-
-            // 2. Sembunyikan tombol masuk
-            const landing = document.getElementById('landing-page');
-            landing.style.opacity = '0';
-            setTimeout(() => {
-                landing.style.display = 'none';
-            }, 500);
-
-            // 3. Tampilkan Video
-            const container = document.getElementById('jitsi-container');
-            container.style.display = 'block';
-
-            // 4. Jalankan Jitsi dengan Data Otomatis
-            const domain = "meet.jit.si";
-            const options = {
-                roomName: KODE_RUANGAN_TETAP,
-                width: "100%",
-                height: "100%",
-                parentNode: document.querySelector('#jitsi-container'),
-                userInfo: {
-                    displayName: namaTamu
-                },
-                configOverwrite: {
-                    startWithAudioMuted: false,
-                    startWithVideoMuted: false,
-                    prejoinPageEnabled: false // Langsung masuk tanpa konfirmasi lagi
-                },
-                interfaceConfigOverwrite: {
-                    SHOW_JITSI_WATERMARK: false,
-                    DEFAULT_BACKGROUND: '#0f172a',
-                    // Hapus tombol-tombol yang tidak perlu agar simpel
-                    toolbarButtons: [
-                        'microphone', 'camera', 'closedcaptions', 'desktop', 'fullscreen',
-                        'fodeviceselection', 'hangup', 'profile', 'chat', 'recording',
-                        'livestreaming', 'etherpad', 'sharedvideo', 'settings', 'raisehand',
-                        'videoquality', 'filmstrip', 'invite', 'feedback', 'stats', 'shortcuts',
-                        'tileview', 'videobackgroundblur', 'download', 'help', 'mute-everyone', 'security'
-                    ]
-                }
-            };
-
-            const api = new JitsiMeetExternalAPI(domain, options);
-        }
+        // Tampilkan loading selama 3 detik pertama
+        loading.style.display = 'block';
+        setTimeout(() => {
+            loading.style.display = 'none';
+        }, 3000);
     </script>
 </body>
 </html>
