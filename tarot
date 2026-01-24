@@ -78,9 +78,9 @@
 
     <!-- HALAMAN DEPAN: TOMBOL AJA -->
     <div id="landing-page">
-        <h1><i class="fas fa-video"></i> Kaka Live Room</h1>
-        <p>Kaka Music Game Studio.</p>
-        <button class="btn-enter" onclick="autoJoin()">Masuk LIVE</button>
+        <h1><i class="fas fa-video"></i> Kumpul Online</h1>
+        <p>Siapa pun yang membuka aplikasi ini akan masuk ke ruangan yang sama.</p>
+        <button class="btn-enter" onclick="autoJoin()">MASUK SEKARANG</button>
     </div>
 
     <!-- CONTAINER VIDEO -->
@@ -93,8 +93,8 @@
         // ========================================
         // PENGATURAN RUANGAN (BISA DIGANTI DISINI)
         // ========================================
-        const KODE_RUANGAN_TETAP = "Kaka Studio"; 
-        // Catatan: Semua orang masuk ke "Kaka Studio".
+        const KODE_RUANGAN_TETAP = "RuangNongkrongBareng"; 
+        // Catatan: Semua orang masuk ke "RuangNongkrongBareng".
         // Jika ingin ganti ruangan baru, ubah teks di atas lalu simpan file.
         // ========================================
 
