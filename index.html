@@ -3,19 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Sulap Kamera Pembaca Pikiran</title>
+    <title>Scanner Aura & Ramalan Bintang</title>
     <style>
         :root {
-            --primary: #ffd700;
-            --overlay: rgba(0, 0, 0, 0.7);
-            --glass: rgba(20, 20, 20, 0.85);
-            --card-bg: #fff;
+            --primary: #00f7ff; /* Cyan futuristik */
+            --secondary: #d400ff; /* Ungu mistis */
+            --bg-glass: rgba(10, 10, 20, 0.85);
+            --text-glow: 0 0 10px var(--primary);
         }
 
         * {
             box-sizing: border-box;
             user-select: none;
-            -webkit-user-select: none;
+            -webkit-tap-highlight-color: transparent;
         }
 
         body, html {
@@ -25,400 +25,421 @@
             height: 100%;
             overflow: hidden;
             background-color: #000;
-            font-family: 'Courier New', Courier, monospace; /* Font mistis */
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             color: white;
         }
 
-        /* Video Background (Kamera) */
-        #video-bg {
+        /* Video Background */
+        #video-feed {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
             object-fit: cover;
-            z-index: 0;
-            transform: scaleX(-1); /* Mirror effect agar seperti cermin */
-            filter: brightness(0.6) contrast(1.2); /* Efek gelap sedikit */
+            z-index: 1;
+            transform: scaleX(-1); /* Efek cermin */
+            filter: contrast(1.1) brightness(0.9) grayscale(0.3);
         }
 
-        /* Container UI */
-        #app-container {
+        /* Scan Overlay (Efek Garis Hijap Biru di video) */
+        #scan-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 2;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            background-size: 100% 2px, 3px 100%;
+            pointer-events: none;
+            display: none;
+        }
+
+        /* Container Utama UI */
+        #ui-container {
             position: relative;
             z-index: 10;
             width: 100%;
             height: 100%;
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
+            justify-content: center;
             align-items: center;
             padding: 20px;
-            pointer-events: none; /* Biarkan klik tembus ke elemen interaktif */
+            text-align: center;
         }
 
-        /* Screen Stages */
+        /* Halaman / Layar */
         .screen {
             display: none;
             width: 100%;
-            max-width: 500px;
-            text-align: center;
-            pointer-events: auto;
+            max-width: 400px;
             flex-direction: column;
             align-items: center;
-            animation: fadeIn 0.5s ease;
+            animation: fadeIn 0.5s ease-out;
         }
 
         .screen.active {
             display: flex;
         }
 
-        /* Start Screen */
+        /* Typography */
         h1 {
-            font-size: 2.5rem;
-            color: var(--primary);
-            text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
-            margin-bottom: 20px;
-            line-height: 1.2;
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-transform: uppercase;
+            letter-spacing: 2px;
         }
 
         p {
-            font-size: 1.1rem;
-            line-height: 1.6;
+            font-size: 1rem;
+            color: #ccc;
             margin-bottom: 30px;
-            color: #ddd;
+            line-height: 1.5;
         }
 
-        .btn {
-            background: var(--primary);
-            color: #000;
-            border: none;
+        /* Tombol */
+        .btn-magic {
+            background: transparent;
+            border: 2px solid var(--primary);
+            color: var(--primary);
             padding: 15px 40px;
-            font-size: 1.2rem;
-            font-weight: bold;
+            font-size: 1.1rem;
             border-radius: 50px;
             cursor: pointer;
-            box-shadow: 0 0 20px rgba(255, 215, 0, 0.4);
-            transition: transform 0.2s, box-shadow 0.2s;
+            text-transform: uppercase;
+            font-weight: bold;
+            box-shadow: 0 0 15px rgba(0, 247, 255, 0.3);
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-magic:active {
+            background: var(--primary);
+            color: #000;
+            box-shadow: 0 0 30px rgba(0, 247, 255, 0.6);
+        }
+
+        /* --- ELEMEN SCANNING --- */
+        .face-frame {
+            width: 250px;
+            height: 320px;
+            border: 2px solid rgba(0, 247, 255, 0.3);
+            position: relative;
+            margin-bottom: 20px;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 0 20px rgba(0, 247, 255, 0.1);
+        }
+
+        /* Sudut-sudut frame */
+        .face-frame::before, .face-frame::after {
+            content: '';
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            border-color: var(--primary);
+            border-style: solid;
+            transition: all 0.5s;
+        }
+
+        .face-frame::before { top: 0; left: 0; border-width: 4px 0 0 4px; border-radius: 10px 0 0 0; }
+        .face-frame::after { bottom: 0; right: 0; border-width: 0 4px 4px 0; border-radius: 0 0 10px 0; }
+
+        .face-frame-corner-bottom-left {
+            position: absolute; bottom: 0; left: 0; width: 30px; height: 30px;
+            border-color: var(--primary); border-style: solid; border-width: 0 0 4px 4px; border-radius: 0 0 0 10px;
+        }
+        .face-frame-corner-top-right {
+            position: absolute; top: 0; right: 0; width: 30px; height: 30px;
+            border-color: var(--primary); border-style: solid; border-width: 4px 4px 0 0; border-radius: 0 10px 0 0;
+        }
+
+        /* Garis Scan Laser */
+        .scan-line {
+            width: 100%;
+            height: 2px;
+            background: var(--primary);
+            box-shadow: 0 0 10px var(--primary), 0 0 20px var(--primary);
+            position: absolute;
+            top: 0;
+            left: 0;
+            animation: scanMove 2s infinite linear;
+            z-index: 2;
+        }
+
+        .scan-text {
+            color: var(--primary);
+            font-family: 'Courier New', monospace;
+            margin-top: 10px;
+            font-size: 0.9rem;
+            min-height: 20px;
+            text-shadow: 0 0 5px var(--primary);
+        }
+
+        /* --- HASIL RAMALAN --- */
+        .result-card {
+            background: var(--bg-glass);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 20px;
+            padding: 30px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 0 40px rgba(0,0,0,0.5);
+            transform: scale(0.9);
+            opacity: 0;
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .result-card.show {
+            transform: scale(1);
+            opacity: 1;
+        }
+
+        .zodiac-icon {
+            font-size: 4rem;
+            margin: 10px 0;
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+            display: inline-block;
+            animation: float 3s infinite ease-in-out;
+        }
+
+        .zodiac-name {
+            font-size: 1.8rem;
+            color: var(--secondary);
+            font-weight: bold;
+            margin-bottom: 5px;
             text-transform: uppercase;
         }
 
-        .btn:active {
-            transform: scale(0.95);
+        .fortune-text {
+            font-size: 1rem;
+            color: #eee;
+            font-style: italic;
+            margin: 20px 0;
+            line-height: 1.6;
+            border-left: 2px solid var(--primary);
+            padding-left: 15px;
+            text-align: left;
         }
 
-        /* Grid Kartu */
-        .card-grid {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            width: 100%;
-            margin-bottom: 20px;
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 20px;
+            text-align: center;
         }
 
-        .column {
-            display: flex;
-            justify-content: space-around;
-            background: rgba(0,0,0,0.3);
+        .stat-box {
+            background: rgba(255,255,255,0.05);
             padding: 10px;
             border-radius: 10px;
-            border: 1px solid rgba(255,255,255,0.1);
-            transition: background 0.3s;
-            cursor: pointer;
         }
 
-        .column:hover {
-            background: rgba(255, 215, 0, 0.2);
-            border-color: var(--primary);
-        }
-
-        .card {
-            width: 40px;
-            height: 60px;
-            background: var(--card-bg);
-            color: #333;
-            border-radius: 4px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            font-size: 1.2rem;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.5);
-            margin: 2px 0;
-        }
-
-        /* Reveal Screen */
-        .magic-circle {
-            width: 150px;
-            height: 150px;
-            border-radius: 50%;
-            background: radial-gradient(circle, var(--primary) 0%, transparent 70%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            animation: pulse 2s infinite;
-            margin-bottom: 30px;
-            box-shadow: 0 0 50px var(--primary);
-        }
-
-        .big-card {
-            width: 120px;
-            height: 180px;
-            background: white;
-            border-radius: 10px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            font-size: 3rem;
-            color: #d00;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
-            border: 5px solid white;
-        }
-
-        .suit-small {
-            font-size: 1.5rem;
-        }
-
-        .loading-spinner {
-            border: 5px solid rgba(255,255,255,0.1);
-            border-top: 5px solid var(--primary);
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            animation: spin 1s linear infinite;
-            margin: 20px;
-        }
+        .stat-label { font-size: 0.7rem; color: #888; text-transform: uppercase; }
+        .stat-value { font-size: 1.2rem; color: var(--primary); font-weight: bold; }
 
         /* Animations */
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes scanMove { 0% { top: 0%; opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { top: 100%; opacity: 0; } }
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
 
-        @keyframes pulse {
-            0% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(1.1); opacity: 0.8; }
-            100% { transform: scale(1); opacity: 1; }
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        /* Mobile Adjustment */
-        @media (max-width: 400px) {
-            .card { width: 30px; height: 45px; font-size: 0.9rem; }
-            h1 { font-size: 2rem; }
-        }
     </style>
 </head>
 <body>
 
-    <!-- Video Kamera -->
-    <video id="video-bg" autoplay playsinline muted></video>
+    <!-- 1. Video Kamera -->
+    <video id="video-feed" autoplay playsinline muted></video>
+    
+    <!-- 2. Overlay Efek TV/Sarang Tawon -->
+    <div id="scan-overlay"></div>
 
-    <div id="app-container">
+    <div id="ui-container">
         
-        <!-- SCREEN 1: Intro -->
+        <!-- LAYAR 1: Intro -->
         <div id="screen-intro" class="screen active">
-            <h1>MIND READER</h1>
-            <p>Aplikasi ini akan membaca pikiran Anda melalui kamera.</p>
-            <p>1. Pilih satu kartu secara mental.<br>2. Jangan beritahu siapapun.<br>3. Ikuti instruksi di layar.</p>
-            <button class="btn" onclick="startGame()">MULAI SULAP</button>
+            <h1>Aura Scanner</h1>
+            <p>Kami menggunakan teknologi kamera canggih untuk mendeteksi aura wajah Anda dan mencocokkannya dengan energi bintang.</p>
+            <button class="btn-magic" onclick="startScanning()">Mulai Scan Wajah</button>
         </div>
 
-        <!-- SCREEN 2: Grid Kartu -->
-        <div id="screen-game" class="screen">
-            <h2 id="instruction-text">Pilih satu kartu di pikiranmu...</h2>
-            <p style="font-size: 0.9rem; margin-top:-10px;">Jangan sentuh kartunya, hanya diingat.</p>
-            
-            <div class="card-grid" id="card-grid">
-                <!-- Kartu akan di-generate oleh JS -->
+        <!-- LAYAR 2: Sedang Scan -->
+        <div id="screen-scanning" class="screen">
+            <div class="face-frame">
+                <div class="face-frame-corner-top-right"></div>
+                <div class="face-frame-corner-bottom-left"></div>
+                <div class="scan-line"></div>
             </div>
-
-            <div style="margin-top: 10px;">
-                <p>Di kolom mana kartu itu berada?</p>
-            </div>
+            <h2 id="scan-status">Mendeteksi Wajah...</h2>
+            <div class="scan-text" id="scan-log">Inisialisasi kamera...</div>
         </div>
 
-        <!-- SCREEN 3: Loading -->
-        <div id="screen-loading" class="screen">
-            <h2>MEMBACA PIKIRAN...</h2>
-            <div class="loading-spinner"></div>
-            <p>Menganalisis ekspresi wajah...</p>
-        </div>
-
-        <!-- SCREEN 4: Hasil -->
+        <!-- LAYAR 3: Hasil Ramalan -->
         <div id="screen-result" class="screen">
-            <h2>INILAH KARTUMU</h2>
-            <div class="magic-circle">
-                <div class="big-card" id="result-card">
-                    <span>A</span>
-                    <span class="suit-small">♠</span>
+            <div class="result-card" id="result-card-el">
+                <div class="zodiac-icon" id="res-icon">♌</div>
+                <div class="zodiac-name" id="res-name">Leo</div>
+                <p style="color:var(--primary); font-size:0.8rem; margin:0;">ENERGI HARI INI</p>
+                
+                <div class="fortune-text" id="res-fortune">
+                    "Hari ini adalah hari keberuntunganmu. Jangan ragu untuk mengambil keputusan besar."
                 </div>
+
+                <div class="stats-grid">
+                    <div class="stat-box">
+                        <div class="stat-label">Angka Hoki</div>
+                        <div class="stat-value" id="res-num">8</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">Warna Aura</div>
+                        <div class="stat-value" id="res-color">Emas</div>
+                    </div>
+                </div>
+                
+                <button class="btn-magic" style="margin-top: 25px; font-size: 0.9rem; padding: 10px 30px;" onclick="resetApp()">Scan Ulang</button>
             </div>
-            <p>Kamera tidak pernah berbohong.</p>
-            <button class="btn" onclick="location.reload()">MAIN LAGI</button>
         </div>
 
     </div>
 
     <script>
-        // --- Variabel Game ---
-        let deck = [];
-        const suits = ['♠', '♥', '♣', '♦'];
-        const values = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
-        let round = 0;
+        // --- Data Ramalan ---
+        const zodiacs = [
+            { name: "Aries", icon: "♈", color: "Merah", num: 9 },
+            { name: "Taurus", icon: "♉", color: "Hijau", num: 6 },
+            { name: "Gemini", icon: "♊", color: "Kuning", num: 5 },
+            { name: "Cancer", icon: "♋", color: "Perak", num: 2 },
+            { name: "Leo", icon: "♌", color: "Emas", num: 1 },
+            { name: "Virgo", icon: "♍", color: "Coklat", num: 4 },
+            { name: "Libra", icon: "♎", color: "Pink", num: 7 },
+            { name: "Scorpio", icon: "♏", color: "Hitam", num: 8 },
+            { name: "Sagittarius", icon: "♐", color: "Ungu", num: 3 },
+            { name: "Capricorn", icon: "♑", color: "Biru Tua", num: 10 },
+            { name: "Aquarius", icon: "♒", color: "Biru Muda", num: 11 },
+            { name: "Pisces", icon: "♓", color: "Laut", num: 12 }
+        ];
 
-        // --- Setup Kamera ---
+        const fortunes = [
+            "Aura Anda bersinar terang hari ini. Banyak orang tertarik pada pesona alami Anda.",
+            "Hindari overthinking. Keputusan yang Anda ambil dengan hati akan membawa hasil terbaik.",
+            "Seseorang dari masa lalu mungkin menghubungi Anda. Bersiaplah untuk kejutan manis.",
+            "Energimu sedang rendah, istirahatlah sejenak dan minum air putih yang cukup.",
+            "Ada peluang finansial yang menghampiri, tapi perlu kecermatan untuk melihatnya.",
+            "Hubungan asmara kamu sedang di ujung tanduk. Komunikasi adalah kuncinya.",
+            "Ini adalah waktu yang tepat untuk memulai proyek baru yang selama kamu impikan.",
+            "Jangan terlalu keras pada diri sendiri. Kamu sudah melakukan yang terbaik.",
+            "Keberuntungan ada di pihakmu dalam hal karir. Tunjukkan kemampuanmu!",
+            "Hati-hati dengan orang yang baru kamu kenal. Intuisimu tidak pernah salah."
+        ];
+
+        // --- Variabel Logika ---
+        let cameraStream = null;
+        const statusMessages = [
+            "Mendeteksi kontur wajah...",
+            "Menganalisis simetri mata...",
+            "Mengukur energi aurik...",
+            "Mencocokkan dengan database galaksi...",
+            "Menghitung resonansi bintang..."
+        ];
+
+        // --- Fungsi Kamera ---
         async function initCamera() {
-            const video = document.getElementById('video-bg');
+            const video = document.getElementById('video-feed');
             try {
-                const stream = await navigator.mediaDevices.getUserMedia({ 
-                    video: { 
-                        facingMode: "user", // Kamera depan
-                        width: { ideal: 1280 },
-                        height: { ideal: 720 }
-                    } 
+                // Meminta akses kamera depan
+                cameraStream = await navigator.mediaDevices.getUserMedia({ 
+                    video: { facingMode: "user", width: { ideal: 640 }, height: { ideal: 480 } } 
                 });
-                video.srcObject = stream;
+                video.srcObject = cameraStream;
             } catch (err) {
-                console.error("Akses kamera ditolak atau error:", err);
-                alert("Mohon izinkan akses kamera agar sulap bekerja!");
+                console.error("Error kamera:", err);
+                alert("Gagal mengakses kamera. Pastikan Anda memberikan izin.");
             }
         }
 
-        // --- Logika Kartu ---
-        function createDeck() {
-            let fullDeck = [];
-            // Buat 52 kartu standar
-            for (let s of suits) {
-                for (let v of values) {
-                    fullDeck.push({ val: v, suit: s, color: (s === '♥' || s === '♦') ? '#d00' : '#000' });
+        // --- Flow Aplikasi ---
+        function startScanning() {
+            // 1. Ganti Layar
+            document.getElementById('screen-intro').classList.remove('active');
+            document.getElementById('screen-scanning').classList.add('active');
+            document.getElementById('scan-overlay').style.display = 'block';
+
+            // 2. Mulai Kamera
+            initCamera();
+
+            // 3. Jalankan Simulasi Scanning
+            let msgIndex = 0;
+            const logEl = document.getElementById('scan-log');
+            
+            // Interval untuk mengganti teks status
+            const msgInterval = setInterval(() => {
+                if(msgIndex < statusMessages.length) {
+                    logEl.innerText = statusMessages[msgIndex];
+                    msgIndex++;
                 }
-            }
-            // Acak awal
-            fullDeck.sort(() => Math.random() - 0.5);
-            // Ambil 21 kartu saja
-            deck = fullDeck.slice(0, 21);
-        }
+            }, 800);
 
-        function renderGrid() {
-            const grid = document.getElementById('card-grid');
-            grid.innerHTML = '';
-            
-            // Kita punya 21 kartu. 3 kolom. 7 baris.
-            // Kolom 0: indeks 0, 3, 6...
-            // Kolom 1: indeks 1, 4, 7...
-            // Kolom 2: indeks 2, 5, 8...
-            
-            for (let col = 0; col < 3; col++) {
-                let colDiv = document.createElement('div');
-                colDiv.className = 'column';
-                colDiv.onclick = () => handleColumnClick(col);
-
-                for (let i = 0; i < 7; i++) {
-                    let index = col + (i * 3);
-                    let cardData = deck[index];
-                    
-                    let cardDiv = document.createElement('div');
-                    cardDiv.className = 'card';
-                    cardDiv.style.color = cardData.color;
-                    cardDiv.innerHTML = `${cardData.val}<br><span style="font-size:0.8rem">${cardData.suit}</span>`;
-                    colDiv.appendChild(cardDiv);
-                }
-                grid.appendChild(colDiv);
-            }
-        }
-
-        // --- Logika Algoritma Sulap (The Matrix Principle) ---
-        // Ini trik matematika klasik "21 Card Trick"
-        function handleColumnClick(selectedColIndex) {
-            // 1. Pecah deck menjadi 3 kolom berdasarkan tata letak layar saat ini
-            let col0 = [], col1 = [], col2 = [];
-            
-            for (let i = 0; i < 21; i++) {
-                // Urutan array deck saat ini adalah:
-                // [0, 3, 6... (Col 0 top to bottom), 1, 4, 7... (Col 1 top to bottom), 2, 5, 8... (Col 2)]
-                // Ini karena rendering kita mengambil deck[0], deck[3] untuk kolom pertama.
-                
-                // Maka:
-                // deck[0] adalah kartu atas kolom 0
-                // deck[1] adalah kartu atas kolom 1
-                // deck[2] adalah kartu atas kolom 2
-                // deck[3] adalah kartu kedua kolom 0
-                
-                if (i % 3 === 0) col0.push(deck[i]);
-                else if (i % 3 === 1) col1.push(deck[i]);
-                else col2.push(deck[i]);
-            }
-
-            let cols = [col0, col1, col2];
-            
-            // 2. Susun ulang deck
-            // Kartu yang dipilih user harus ada di KOLOM TENGAH (posisi 7-13)
-            // Pola susunan baru: [Tidak Dipilih] + [Dipilih] + [Tidak Dipilih]
-            
-            let newDeck = [];
-            
-            if (selectedColIndex === 0) {
-                // User pilih kolom 0. Susun: 1, 0, 2 (0 di tengah)
-                newDeck = [...col1, ...col0, ...col2];
-            } else if (selectedColIndex === 1) {
-                // User pilih kolom 1. Susun: 0, 1, 2 (1 di tengah)
-                newDeck = [...col0, ...col1, ...col2];
-            } else {
-                // User pilih kolom 2. Susun: 0, 2, 1 (2 di tengah) -> Atau 1, 2, 0.
-                // Asal saja selama kolom terpilih ada di tengah susunan.
-                newDeck = [...col0, ...col2, ...col1];
-            }
-
-            deck = newDeck;
-            round++;
-
-            if (round < 3) {
-                // Masih ada ronde
-                renderGrid();
-                document.getElementById('instruction-text').innerText = `Bagus... Sekarang di kolom mana kartu itu?`;
-            } else {
-                // Selesai
-                finishGame();
-            }
-        }
-
-        // --- Flow Kontrol ---
-        function startGame() {
-            initCamera(); // Mulai kamera
-            createDeck();
-            renderGrid();
-            switchScreen('screen-game');
-        }
-
-        function finishGame() {
-            switchScreen('screen-loading');
-            
-            // Tunggu sedikit agar dramatis
+            // Durasi scan total (4 detik)
             setTimeout(() => {
-                // Trik matematika: Setelah 3 pengacakan dengan metode ini, 
-                // kartu target PASTI berada di indeks ke-10 (kartu ke-11, yaitu tengah deck).
-                const targetCard = deck[10];
-                
-                const resultCard = document.getElementById('result-card');
-                resultCard.innerHTML = `<span>${targetCard.val}</span><span class="suit-small">${targetCard.suit}</span>`;
-                resultCard.style.color = targetCard.color;
-                
-                switchScreen('screen-result');
-            }, 2000);
+                clearInterval(msgInterval);
+                showResult();
+            }, 4000);
         }
 
-        function switchScreen(id) {
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            document.getElementById(id).classList.add('active');
+        function showResult() {
+            // 1. Pilih Data Acak
+            const randomZodiac = zodiacs[Math.floor(Math.random() * zodiacs.length)];
+            const randomFortune = fortunes[Math.floor(Math.random() * fortunes.length)];
+            
+            // 2. Isi Data ke HTML
+            document.getElementById('res-icon').innerText = randomZodiac.icon;
+            document.getElementById('res-name').innerText = randomZodiac.name;
+            document.getElementById('res-fortune').innerText = `"${randomFortune}"`;
+            document.getElementById('res-num').innerText = randomZodiac.num;
+            document.getElementById('res-color').innerText = randomZodiac.color;
+            document.getElementById('res-color').style.color = getRandomColor(); // Warnai teks warna random
+
+            // 3. Pindah Layar
+            document.getElementById('screen-scanning').classList.remove('active');
+            document.getElementById('scan-overlay').style.display = 'none'; // Matikan overlay scan
+            
+            const resultScreen = document.getElementById('screen-result');
+            resultScreen.classList.add('active');
+            
+            // Animasi pop-up kartu
+            setTimeout(() => {
+                document.getElementById('result-card-el').classList.add('show');
+            }, 100);
         }
 
-        // Jalankan kamera begitu load (opsional, lebih baik saat klik tombol untuk izin user)
-        // Tapi browser modern mungkin butuh gesture user pertama. Kita pasang di tombol "Mulai".
+        function resetApp() {
+            // Reset tampilan ke awal
+            document.getElementById('screen-result').classList.remove('active');
+            document.getElementById('result-card-el').classList.remove('show');
+            document.getElementById('screen-intro').classList.add('active');
+            
+            // Matikan kamera untuk hemat baterai (opsional)
+            if (cameraStream) {
+                cameraStream.getTracks().forEach(track => track.stop());
+            }
+        }
+
+        // Helper: Random Color Hex
+        function getRandomColor() {
+            const letters = '0123456789ABCDEF';
+            let color = '#';
+            for (let i = 0; i < 6; i++) {
+                color += letters[Math.floor(Math.random() * 16)];
+            }
+            return color;
+        }
     </script>
 </body>
 </html>
