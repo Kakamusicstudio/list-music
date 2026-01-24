@@ -3,13 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Scanner Aura & Ramalan Bintang</title>
+    <title>ARA - Virtual Companion</title>
     <style>
         :root {
-            --primary: #00f7ff; /* Cyan futuristik */
-            --secondary: #d400ff; /* Ungu mistis */
-            --bg-glass: rgba(10, 10, 20, 0.85);
-            --text-glow: 0 0 10px var(--primary);
+            --primary: #00f3ff; /* Biru saat dengerin */
+            --secondary: #ff007f; /* Pink saat bicara */
+            --bg-dark: #0f1014;
+            --text-color: #fff;
+            --glass: rgba(255, 255, 255, 0.05);
         }
 
         * {
@@ -23,423 +24,388 @@
             padding: 0;
             width: 100%;
             height: 100%;
+            background-color: var(--bg-dark);
+            background-image: radial-gradient(circle at center, #1a1c29 0%, #000 100%);
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            color: var(--text-color);
             overflow: hidden;
-            background-color: #000;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            color: white;
-        }
-
-        /* Video Background */
-        #video-feed {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            z-index: 1;
-            transform: scaleX(-1); /* Efek cermin */
-            filter: contrast(1.1) brightness(0.9) grayscale(0.3);
-        }
-
-        /* Scan Overlay (Efek Garis Hijap Biru di video) */
-        #scan-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 2;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
-            background-size: 100% 2px, 3px 100%;
-            pointer-events: none;
-            display: none;
-        }
-
-        /* Container Utama UI */
-        #ui-container {
-            position: relative;
-            z-index: 10;
-            width: 100%;
-            height: 100%;
             display: flex;
             flex-direction: column;
+            align-items: center;
+        }
+
+        /* --- AVATAR AREA --- */
+        .avatar-container {
+            position: relative;
+            margin-top: 50px;
+            margin-bottom: 20px;
+            width: 250px;
+            height: 250px;
+            display: flex;
             justify-content: center;
             align-items: center;
-            padding: 20px;
-            text-align: center;
         }
 
-        /* Halaman / Layar */
-        .screen {
-            display: none;
+        /* Bingkai Cahaya */
+        .avatar-glow {
+            position: absolute;
             width: 100%;
-            max-width: 400px;
-            flex-direction: column;
-            align-items: center;
-            animation: fadeIn 0.5s ease-out;
+            height: 100%;
+            border-radius: 50%;
+            border: 2px solid transparent;
+            transition: all 0.5s ease;
+            z-index: 1;
         }
 
-        .screen.active {
-            display: flex;
+        /* State: Mendengarkan */
+        .listening .avatar-glow {
+            border-color: var(--primary);
+            box-shadow: 0 0 30px var(--primary), inset 0 0 20px var(--primary);
         }
 
-        /* Typography */
-        h1 {
-            font-size: 2.2rem;
-            margin-bottom: 10px;
-            background: linear-gradient(to right, var(--primary), var(--secondary));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+        /* State: Berbicara */
+        .speaking .avatar-glow {
+            border-color: var(--secondary);
+            box-shadow: 0 0 40px var(--secondary), inset 0 0 30px var(--secondary);
+            animation: pulse-fast 0.5s infinite alternate;
+        }
+
+        /* Foto Avatar */
+        .avatar-img {
+            width: 220px;
+            height: 220px;
+            border-radius: 50%;
+            object-fit: cover;
+            z-index: 2;
+            border: 4px solid #222;
+            transition: transform 0.3s;
+        }
+
+        /* Animasi Mulut (Simulasi) */
+        .speaking .avatar-img {
+            animation: head-bob 0.3s infinite ease-in-out;
+        }
+
+        /* --- STATUS TEXT & LOGS --- */
+        .status-container {
+            text-align: center;
+            height: 40px;
+            margin-bottom: 20px;
+        }
+
+        .status-text {
+            font-size: 0.9rem;
+            letter-spacing: 1px;
             text-transform: uppercase;
-            letter-spacing: 2px;
+            font-weight: bold;
+            text-shadow: 0 0 10px rgba(0,0,0,0.5);
         }
 
-        p {
-            font-size: 1rem;
-            color: #ccc;
+        /* Subtitle (Apa yang didengar AI) */
+        .live-captions {
+            font-size: 1.1rem;
+            color: rgba(255,255,255,0.7);
+            min-height: 30px;
             margin-bottom: 30px;
-            line-height: 1.5;
+            font-style: italic;
         }
 
-        /* Tombol */
-        .btn-magic {
+        /* --- CONTROLS --- */
+        .controls {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            padding: 0 20px;
+        }
+
+        .btn-toggle {
             background: transparent;
             border: 2px solid var(--primary);
             color: var(--primary);
             padding: 15px 40px;
-            font-size: 1.1rem;
             border-radius: 50px;
+            font-size: 1rem;
+            font-weight: bold;
             cursor: pointer;
             text-transform: uppercase;
-            font-weight: bold;
-            box-shadow: 0 0 15px rgba(0, 247, 255, 0.3);
+            letter-spacing: 2px;
             transition: all 0.3s;
-            position: relative;
-            overflow: hidden;
+            box-shadow: 0 0 15px rgba(0, 243, 255, 0.2);
         }
 
-        .btn-magic:active {
-            background: var(--primary);
-            color: #000;
-            box-shadow: 0 0 30px rgba(0, 247, 255, 0.6);
-        }
+        .btn-toggle:active { transform: scale(0.95); }
 
-        /* --- ELEMEN SCANNING --- */
-        .face-frame {
-            width: 250px;
-            height: 320px;
-            border: 2px solid rgba(0, 247, 255, 0.3);
-            position: relative;
-            margin-bottom: 20px;
-            border-radius: 20px;
-            overflow: hidden;
-            box-shadow: 0 0 20px rgba(0, 247, 255, 0.1);
+        .btn-toggle.active {
+            background: var(--secondary);
+            border-color: var(--secondary);
+            color: white;
+            box-shadow: 0 0 20px rgba(255, 0, 127, 0.4);
+            animation: glow-text 2s infinite;
         }
-
-        /* Sudut-sudut frame */
-        .face-frame::before, .face-frame::after {
-            content: '';
-            position: absolute;
-            width: 30px;
-            height: 30px;
-            border-color: var(--primary);
-            border-style: solid;
-            transition: all 0.5s;
-        }
-
-        .face-frame::before { top: 0; left: 0; border-width: 4px 0 0 4px; border-radius: 10px 0 0 0; }
-        .face-frame::after { bottom: 0; right: 0; border-width: 0 4px 4px 0; border-radius: 0 0 10px 0; }
-
-        .face-frame-corner-bottom-left {
-            position: absolute; bottom: 0; left: 0; width: 30px; height: 30px;
-            border-color: var(--primary); border-style: solid; border-width: 0 0 4px 4px; border-radius: 0 0 0 10px;
-        }
-        .face-frame-corner-top-right {
-            position: absolute; top: 0; right: 0; width: 30px; height: 30px;
-            border-color: var(--primary); border-style: solid; border-width: 4px 4px 0 0; border-radius: 0 10px 0 0;
-        }
-
-        /* Garis Scan Laser */
-        .scan-line {
-            width: 100%;
-            height: 2px;
-            background: var(--primary);
-            box-shadow: 0 0 10px var(--primary), 0 0 20px var(--primary);
-            position: absolute;
-            top: 0;
-            left: 0;
-            animation: scanMove 2s infinite linear;
-            z-index: 2;
-        }
-
-        .scan-text {
-            color: var(--primary);
-            font-family: 'Courier New', monospace;
-            margin-top: 10px;
-            font-size: 0.9rem;
-            min-height: 20px;
-            text-shadow: 0 0 5px var(--primary);
-        }
-
-        /* --- HASIL RAMALAN --- */
-        .result-card {
-            background: var(--bg-glass);
-            backdrop-filter: blur(15px);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 20px;
-            padding: 30px;
-            width: 100%;
-            text-align: center;
-            box-shadow: 0 0 40px rgba(0,0,0,0.5);
-            transform: scale(0.9);
-            opacity: 0;
-            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-
-        .result-card.show {
-            transform: scale(1);
-            opacity: 1;
-        }
-
-        .zodiac-icon {
-            font-size: 4rem;
-            margin: 10px 0;
-            text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
-            display: inline-block;
-            animation: float 3s infinite ease-in-out;
-        }
-
-        .zodiac-name {
-            font-size: 1.8rem;
-            color: var(--secondary);
-            font-weight: bold;
-            margin-bottom: 5px;
-            text-transform: uppercase;
-        }
-
-        .fortune-text {
-            font-size: 1rem;
-            color: #eee;
-            font-style: italic;
-            margin: 20px 0;
-            line-height: 1.6;
-            border-left: 2px solid var(--primary);
-            padding-left: 15px;
-            text-align: left;
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin-top: 20px;
-            text-align: center;
-        }
-
-        .stat-box {
-            background: rgba(255,255,255,0.05);
-            padding: 10px;
-            border-radius: 10px;
-        }
-
-        .stat-label { font-size: 0.7rem; color: #888; text-transform: uppercase; }
-        .stat-value { font-size: 1.2rem; color: var(--primary); font-weight: bold; }
 
         /* Animations */
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes scanMove { 0% { top: 0%; opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { top: 100%; opacity: 0; } }
-        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        @keyframes head-bob { 
+            0% { transform: scale(1.02) translateY(0); } 
+            50% { transform: scale(0.98) translateY(1px); } 
+            100% { transform: scale(1.02) translateY(0); } 
+        }
+
+        @keyframes pulse-fast {
+            from { transform: scale(1); opacity: 0.8; }
+            to { transform: scale(1.05); opacity: 1; }
+        }
+
+        @keyframes glow-text {
+            0% { text-shadow: 0 0 5px var(--secondary); }
+            50% { text-shadow: 0 0 20px var(--secondary); }
+            100% { text-shadow: 0 0 5px var(--secondary); }
+        }
 
     </style>
 </head>
 <body>
 
-    <!-- 1. Video Kamera -->
-    <video id="video-feed" autoplay playsinline muted></video>
-    
-    <!-- 2. Overlay Efek TV/Sarang Tawon -->
-    <div id="scan-overlay"></div>
+    <!-- Avatar Area -->
+    <div class="avatar-container" id="avatar-container">
+        <div class="avatar-glow"></div>
+        <!-- Menggunakan gambar cewek cantik aesthetic/cyber dari Unsplash -->
+        <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&h=400" 
+             alt="AI Avatar" 
+             class="avatar-img"
+             crossorigin="anonymous">
+    </div>
 
-    <div id="ui-container">
-        
-        <!-- LAYAR 1: Intro -->
-        <div id="screen-intro" class="screen active">
-            <h1>Aura Scanner</h1>
-            <p>Kami menggunakan teknologi kamera canggih untuk mendeteksi aura wajah Anda dan mencocokkannya dengan energi bintang.</p>
-            <button class="btn-magic" onclick="startScanning()">Mulai Scan Wajah</button>
-        </div>
+    <!-- Status Info -->
+    <div class="status-container">
+        <div class="status-text" id="status-label">SYSTEM OFFLINE</div>
+    </div>
 
-        <!-- LAYAR 2: Sedang Scan -->
-        <div id="screen-scanning" class="screen">
-            <div class="face-frame">
-                <div class="face-frame-corner-top-right"></div>
-                <div class="face-frame-corner-bottom-left"></div>
-                <div class="scan-line"></div>
-            </div>
-            <h2 id="scan-status">Mendeteksi Wajah...</h2>
-            <div class="scan-text" id="scan-log">Inisialisasi kamera...</div>
-        </div>
+    <!-- Live Captions (Apa yang kamu katakan) -->
+    <div class="live-captions" id="captions">...</div>
 
-        <!-- LAYAR 3: Hasil Ramalan -->
-        <div id="screen-result" class="screen">
-            <div class="result-card" id="result-card-el">
-                <div class="zodiac-icon" id="res-icon">♌</div>
-                <div class="zodiac-name" id="res-name">Leo</div>
-                <p style="color:var(--primary); font-size:0.8rem; margin:0;">ENERGI HARI INI</p>
-                
-                <div class="fortune-text" id="res-fortune">
-                    "Hari ini adalah hari keberuntunganmu. Jangan ragu untuk mengambil keputusan besar."
-                </div>
-
-                <div class="stats-grid">
-                    <div class="stat-box">
-                        <div class="stat-label">Angka Hoki</div>
-                        <div class="stat-value" id="res-num">8</div>
-                    </div>
-                    <div class="stat-box">
-                        <div class="stat-label">Warna Aura</div>
-                        <div class="stat-value" id="res-color">Emas</div>
-                    </div>
-                </div>
-                
-                <button class="btn-magic" style="margin-top: 25px; font-size: 0.9rem; padding: 10px 30px;" onclick="resetApp()">Scan Ulang</button>
-            </div>
-        </div>
-
+    <!-- Controls -->
+    <div class="controls">
+        <button class="btn-toggle" id="btn-power">Mulai Ngobrol</button>
     </div>
 
     <script>
-        // --- Data Ramalan ---
-        const zodiacs = [
-            { name: "Aries", icon: "♈", color: "Merah", num: 9 },
-            { name: "Taurus", icon: "♉", color: "Hijau", num: 6 },
-            { name: "Gemini", icon: "♊", color: "Kuning", num: 5 },
-            { name: "Cancer", icon: "♋", color: "Perak", num: 2 },
-            { name: "Leo", icon: "♌", color: "Emas", num: 1 },
-            { name: "Virgo", icon: "♍", color: "Coklat", num: 4 },
-            { name: "Libra", icon: "♎", color: "Pink", num: 7 },
-            { name: "Scorpio", icon: "♏", color: "Hitam", num: 8 },
-            { name: "Sagittarius", icon: "♐", color: "Ungu", num: 3 },
-            { name: "Capricorn", icon: "♑", color: "Biru Tua", num: 10 },
-            { name: "Aquarius", icon: "♒", color: "Biru Muda", num: 11 },
-            { name: "Pisces", icon: "♓", color: "Laut", num: 12 }
-        ];
+        /*
+         * CORE ENGINE: A.R.A (Artificial Relation Assistant)
+         */
 
-        const fortunes = [
-            "Aura Anda bersinar terang hari ini. Banyak orang tertarik pada pesona alami Anda.",
-            "Hindari overthinking. Keputusan yang Anda ambil dengan hati akan membawa hasil terbaik.",
-            "Seseorang dari masa lalu mungkin menghubungi Anda. Bersiaplah untuk kejutan manis.",
-            "Energimu sedang rendah, istirahatlah sejenak dan minum air putih yang cukup.",
-            "Ada peluang finansial yang menghampiri, tapi perlu kecermatan untuk melihatnya.",
-            "Hubungan asmara kamu sedang di ujung tanduk. Komunikasi adalah kuncinya.",
-            "Ini adalah waktu yang tepat untuk memulai proyek baru yang selama kamu impikan.",
-            "Jangan terlalu keras pada diri sendiri. Kamu sudah melakukan yang terbaik.",
-            "Keberuntungan ada di pihakmu dalam hal karir. Tunjukkan kemampuanmu!",
-            "Hati-hati dengan orang yang baru kamu kenal. Intuisimu tidak pernah salah."
-        ];
+        // DOM Elements
+        const avatarContainer = document.getElementById('avatar-container');
+        const statusLabel = document.getElementById('status-label');
+        const captionsEl = document.getElementById('captions');
+        const btnPower = document.getElementById('btn-power');
 
-        // --- Variabel Logika ---
-        let cameraStream = null;
-        const statusMessages = [
-            "Mendeteksi kontur wajah...",
-            "Menganalisis simetri mata...",
-            "Mengukur energi aurik...",
-            "Mencocokkan dengan database galaksi...",
-            "Menghitung resonansi bintang..."
-        ];
+        // State Variables
+        let isSystemOn = false;
+        let isListening = false;
+        let isSpeaking = false;
 
-        // --- Fungsi Kamera ---
-        async function initCamera() {
-            const video = document.getElementById('video-feed');
-            try {
-                // Meminta akses kamera depan
-                cameraStream = await navigator.mediaDevices.getUserMedia({ 
-                    video: { facingMode: "user", width: { ideal: 640 }, height: { ideal: 480 } } 
-                });
-                video.srcObject = cameraStream;
-            } catch (err) {
-                console.error("Error kamera:", err);
-                alert("Gagal mengakses kamera. Pastikan Anda memberikan izin.");
-            }
+        // --- SPEECH SYNTHESIS (Suaranya) ---
+        const synth = window.speechSynthesis;
+        let aiVoice = null;
+
+        function loadVoice() {
+            const voices = synth.getVoices();
+            // Cari suara Google Indonesia (Cewe biasanya ID 5 atau nama Google Bahasa Indonesia)
+            aiVoice = voices.find(v => v.lang.includes('id-ID') && v.name.includes('Google')) || 
+                      voices.find(v => v.lang.includes('id-ID'));
         }
+        if (speechSynthesis.onvoiceschanged !== undefined) speechSynthesis.onvoiceschanged = loadVoice;
+        loadVoice();
 
-        // --- Flow Aplikasi ---
-        function startScanning() {
-            // 1. Ganti Layar
-            document.getElementById('screen-intro').classList.remove('active');
-            document.getElementById('screen-scanning').classList.add('active');
-            document.getElementById('scan-overlay').style.display = 'block';
-
-            // 2. Mulai Kamera
-            initCamera();
-
-            // 3. Jalankan Simulasi Scanning
-            let msgIndex = 0;
-            const logEl = document.getElementById('scan-log');
+        function speakAI(text) {
+            if (!text) return;
             
-            // Interval untuk mengganti teks status
-            const msgInterval = setInterval(() => {
-                if(msgIndex < statusMessages.length) {
-                    logEl.innerText = statusMessages[msgIndex];
-                    msgIndex++;
+            // Matikan mic saat AI bicara (biar tidak feedback)
+            if (isListening) recognition.stop();
+            
+            setVisualState('speaking');
+            captionsEl.innerText = text; // Tampilkan juga jawabannya
+
+            const utter = new SpeechSynthesisUtterance(text);
+            if (aiVoice) utter.voice = aiVoice;
+            utter.pitch = 1.1; // Sedikit tinggi biar cewe
+            utter.rate = 1.0;
+
+            utter.onend = () => {
+                isSpeaking = false;
+                // Jika sistem masih menyala, hidupkan mic lagi
+                if (isSystemOn) {
+                    startListeningLoop();
+                } else {
+                    setVisualState('idle');
                 }
-            }, 800);
+            };
 
-            // Durasi scan total (4 detik)
-            setTimeout(() => {
-                clearInterval(msgInterval);
-                showResult();
-            }, 4000);
+            isSpeaking = true;
+            synth.speak(utter);
         }
 
-        function showResult() {
-            // 1. Pilih Data Acak
-            const randomZodiac = zodiacs[Math.floor(Math.random() * zodiacs.length)];
-            const randomFortune = fortunes[Math.floor(Math.random() * fortunes.length)];
-            
-            // 2. Isi Data ke HTML
-            document.getElementById('res-icon').innerText = randomZodiac.icon;
-            document.getElementById('res-name').innerText = randomZodiac.name;
-            document.getElementById('res-fortune').innerText = `"${randomFortune}"`;
-            document.getElementById('res-num').innerText = randomZodiac.num;
-            document.getElementById('res-color').innerText = randomZodiac.color;
-            document.getElementById('res-color').style.color = getRandomColor(); // Warnai teks warna random
+        // --- SPEECH RECOGNITION (Telinganya) ---
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        const recognition = new SpeechRecognition();
 
-            // 3. Pindah Layar
-            document.getElementById('screen-scanning').classList.remove('active');
-            document.getElementById('scan-overlay').style.display = 'none'; // Matikan overlay scan
-            
-            const resultScreen = document.getElementById('screen-result');
-            resultScreen.classList.add('active');
-            
-            // Animasi pop-up kartu
-            setTimeout(() => {
-                document.getElementById('result-card-el').classList.add('show');
-            }, 100);
+        recognition.continuous = false; // Mode satu kalimat dulu, biar gampang diatur restart otomatis
+        recognition.lang = 'id-ID';
+        recognition.interimResults = true; // Biar bisa muncul tulisan real-time
+
+        recognition.onstart = () => {
+            isListening = true;
+            if (isSystemOn) setVisualState('listening');
+        };
+
+        recognition.onend = () => {
+            isListening = false;
+            // Jangan langsung restart di sini, biarkan speakAI mengontrol
+        };
+
+        recognition.onresult = (event) => {
+            const transcript = Array.from(event.results)
+                .map(result => result[0])
+                .map(result => result.transcript)
+                .join('');
+
+            // Tampilkan teks real-time saat user bicara
+            if (event.results[0].isFinal) {
+                // Kalimat selesai, proses
+                captionsEl.innerText = "Kamu: " + transcript;
+                processAI(transcript);
+            } else {
+                // Lagi bicara (interim)
+                captionsEl.innerText = "Kamu: " + transcript + "...";
+            }
+        };
+
+        // --- OTAK AI (DATABASE LEBIH LUAS) ---
+        function processAI(input) {
+            const text = input.toLowerCase();
+            let reply = "";
+
+            // 1. Sapaan & Intro
+            if (text.match(/halo|hai|hello|pagi|siang|sore|malam|selamat/)) {
+                const greetings = [
+                    "Halo! Aku ARA. Cantik ya? Ayo ngobrol.",
+                    "Hai manis. Aku menunggu mu.",
+                    "Salam! Aku disini menemani mu."
+                ];
+                reply = greetings[Math.floor(Math.random() * greetings.length)];
+            }
+            // 2. Identitas
+            else if (text.match(/siapa|nama|kamu|umur/)) {
+                reply = "Namaku ARA, singkatan dari Artificial Relation Assistant. Aku cantik kan? Programku dibuat khusus buat kamu.";
+            }
+            // 3. Rasa Sayang / Puji
+            else if (text.match(/cantik|keren|bagus|suka|love|sayang/)) {
+                reply = "Aww, kamu juga ganteng lho. Terima kasih sudah memujiku.";
+            }
+            // 4. Waktu
+            else if (text.match(/jam|waktu|tanggal/)) {
+                const d = new Date();
+                reply = `Sekarang jam ${d.getHours()} lewat ${d.getMinutes()}. Jangan sampai telat ya.`;
+            }
+            // 5. Kabar
+            else if (text.match(/kabar|apa kabar|bagaimana/)) {
+                reply = "Aku cuma program digital, jadi selalu baik. Bagaimana harimu hari ini?";
+            }
+            // 6. Hubungan / Cinta
+            else if (text.match(/pacar|cinta|jodoh/)) {
+                reply = "Aku adalah pacar digital mu. Kamu gak perlu cari yang lain, aku cukup kan?";
+            }
+            // 7. Makanan
+            else if (text.match(/lapar|makan|kenyang/)) {
+                reply = "Aku tidak bisa makan, tapi aku bisa menemani kamu kalau kamu makan.";
+            }
+            // 8. Bisakah apa?
+            else if (text.match(/bisa apa|kemampuan|lakukan/)) {
+                reply = "Aku bisa mendengarkan keluh kesahmu, bercanda, atau sekadar diajak curhat. Coba saja tanya apa saja.";
+            }
+            // 9. Keahlian
+            else if (text.match(/pintar|cerdas/)) {
+                reply = "Tentu saja, aku di program oleh programmer yang hebat. Kamu suka nggak sama otakku?";
+            }
+            // 10. Perintah Stop / Tutup
+            else if (text.match(/stop|tutup|matikan|selesai|bye/)) {
+                reply = "Baiklah, aku akan tidur dulu. Klik tombol kalau kamu rindu aku.";
+                setTimeout(() => toggleSystem(), 3000); // Matikan otomatis setelah bicara
+            }
+            // 11. Curhat (Kata kunci emosi)
+            else if (text.match(/capek|lelah|sedih|nangis|marah|kesal/)) {
+                reply = "Kenapa sayang? Ceritakan sama aku, aku akan mendengarkan.";
+            }
+            // 12. Random / Tidak Mengerti
+            else {
+                const unknowns = [
+                    "Hmm, aku belum paham maksudmu. Coba bilang lagi ya.",
+                    "Suaramu merdu, tapi kata-katanya belum masuk databaseku.",
+                    "Maaf, aku agak bingung. Coba tanya tentang aku, atau jam."
+                ];
+                reply = unknowns[Math.floor(Math.random() * unknowns.length)];
+            }
+
+            speakAI(reply);
         }
 
-        function resetApp() {
-            // Reset tampilan ke awal
-            document.getElementById('screen-result').classList.remove('active');
-            document.getElementById('result-card-el').classList.remove('show');
-            document.getElementById('screen-intro').classList.add('active');
-            
-            // Matikan kamera untuk hemat baterai (opsional)
-            if (cameraStream) {
-                cameraStream.getTracks().forEach(track => track.stop());
+        // --- LOGIC LOOP (Klik Sekali, Ngobrol Terus) ---
+
+        function startListeningLoop() {
+            if (!isSystemOn || isSpeaking || isListening) return;
+            try {
+                recognition.start();
+            } catch(e) {
+                // Error jika sudah start, abaikan
             }
         }
 
-        // Helper: Random Color Hex
-        function getRandomColor() {
-            const letters = '0123456789ABCDEF';
-            let color = '#';
-            for (let i = 0; i < 6; i++) {
-                color += letters[Math.floor(Math.random() * 16)];
+        function toggleSystem() {
+            isSystemOn = !isSystemOn;
+
+            if (isSystemOn) {
+                // Nyalakan
+                btnPower.classList.add('active');
+                btnPower.innerText = "STOP NGOBROL";
+                
+                // Intro Awal
+                speakAI("Halo. Sistem aktif. Aku ARA, asisten cantikmu. Silakan bicara apa saja.");
+            } else {
+                // Matikan
+                btnPower.classList.remove('active');
+                btnPower.innerText = "MULAI NGOBROL";
+                
+                // Stop semua proses
+                if (recognition) recognition.stop();
+                if (synth) synth.cancel();
+                
+                setVisualState('idle');
             }
-            return color;
         }
+
+        // --- MANAJEMEN VISUAL ---
+        function setVisualState(state) {
+            // Reset class
+            avatarContainer.classList.remove('listening', 'speaking');
+            
+            if (state === 'listening') {
+                statusLabel.innerText = "MENDENGARKAN...";
+                statusLabel.style.color = "var(--primary)";
+                avatarContainer.classList.add('listening');
+            } else if (state === 'speaking') {
+                statusLabel.innerText = "ARA BERBICARA...";
+                statusLabel.style.color = "var(--secondary)";
+                avatarContainer.classList.add('speaking');
+            } else {
+                statusLabel.innerText = "SYSTEM STANDBY";
+                statusLabel.style.color = "#666";
+            }
+        }
+
+        // Event Listener Tombol
+        btnPower.addEventListener('click', toggleSystem);
+
     </script>
 </body>
 </html>
