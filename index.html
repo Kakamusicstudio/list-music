@@ -3,163 +3,91 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Qwen AI - Voice Chat</title>
+    <title>Qwen Turbo Voice</title>
     <style>
+        /* STYLE QWEN DARK */
         :root {
-            --bg-dark: #171717;
-            --primary: #10a37f; /* Qwen Green */
-            --listening-color: #00f0ff; /* Biru saat dengar */
-            --speaking-color: #10a37f; /* Hijau saat bicara */
-            --text-main: #ececec;
+            --bg-color: #000;
+            --primary: #10a37f;
+            --accent: #00f0ff;
+            --speaking: #10a37f;
+            --text-main: #ffffff;
             --text-sub: #666;
         }
 
         body, html {
             margin: 0; padding: 0; width: 100%; height: 100%;
-            background-color: var(--bg-dark);
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg-color);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
             color: var(--text-main);
             display: flex; flex-direction: column; overflow: hidden;
         }
 
-        /* Header Kecil */
-        header {
-            position: absolute; top: 0; left: 0; width: 100%;
-            height: 60px; display: flex; align-items: center; justify-content: space-between;
-            padding: 0 20px; z-index: 10; border-bottom: 1px solid #333;
-        }
-        .brand { font-weight: bold; color: var(--primary); display: flex; align-items: center; gap: 8px; }
-
-        /* Layar Utama */
-        .main-stage {
-            flex: 1; position: relative; display: flex;
-            flex-direction: column; align-items: center; justify-content: center;
-        }
-
-        /* STATUS BESAR (Penting untuk Mode Suara) */
-        .status-display {
-            text-align: center;
-            margin-bottom: 40px;
-            z-index: 5;
-            transition: all 0.3s;
-        }
-
-        .status-title {
-            font-size: 1.2rem; font-weight: 600; margin-bottom: 5px;
-            text-transform: uppercase; letter-spacing: 2px;
-        }
-
-        .status-sub {
-            font-size: 0.9rem; color: var(--text-sub);
-        }
-
-        /* Visualisasi Gelombang Suara (Hanya CSS) */
-        .wave-container {
-            display: flex; align-items: center; justify-content: center; gap: 6px; height: 40px;
-            opacity: 0; transition: opacity 0.3s;
-        }
-        .bar { width: 6px; background: var(--primary); border-radius: 4px; animation: none; }
-
-        /* Tombol Mikrofon Besar */
-        .mic-button-large {
-            width: 80px; height: 80px; border-radius: 50%;
-            background: #2d2d2d; border: 2px solid #444;
-            display: flex; align-items: center; justify-content: center;
-            cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-            position: relative; z-index: 20;
-        }
-        .mic-button-large svg { width: 30px; height: 30px; fill: #888; transition: fill 0.3s; }
-
-        /* States */
-        /* 1. Listening */
-        .mic-button-large.listening {
-            border-color: var(--listening-color);
-            background: #1a1a1a;
-            animation: pulse-blue 2s infinite;
-        }
-        .mic-button-large.listening svg { fill: var(--listening-color); }
-        
-        /* 2. Speaking */
-        .mic-button-large.speaking {
-            border-color: var(--speaking-color);
-            background: var(--speaking-color);
-            transform: scale(1.1);
-            box-shadow: 0 0 30px rgba(16, 163, 127, 0.4);
-        }
-        .mic-button-large.speaking svg { fill: white; }
-
-        /* Chat Transkrip (Background) */
-        #chat-log {
-            position: absolute; top: 80px; bottom: 100px; left: 0; right: 0;
-            overflow-y: auto; padding: 20px;
-            display: flex; flex-direction: column; gap: 15px;
-            opacity: 0.3; pointer-events: none; /* Supaya tidak ganggu */
-            align-items: center;
-        }
-        .log-item { font-size: 0.9rem; color: #888; max-width: 80%; text-align: center; }
-        .log-item.ai { color: var(--primary); font-weight: 500; }
-
-        /* Animations */
-        @keyframes pulse-blue {
-            0% { box-shadow: 0 0 0 0 rgba(0, 240, 255, 0.4); }
-            70% { box-shadow: 0 0 0 20px rgba(0, 240, 255, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(0, 240, 255, 0); }
-        }
-        
-        @keyframes wave { 0%, 100% { height: 10px; } 50% { height: 30px; } }
-        
-        .speaking .wave-container { opacity: 1; }
-        .speaking .bar { animation: wave 0.5s infinite ease-in-out; }
-        .bar:nth-child(2) { animation-delay: 0.1s; }
-        .bar:nth-child(3) { animation-delay: 0.2s; }
-        .bar:nth-child(4) { animation-delay: 0.3s; }
-        .bar:nth-child(5) { animation-delay: 0.4s; }
-
-        /* Settings Overlay */
-        #settings-modal {
+        /* START OVERLAY */
+        #start-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.8); z-index: 100;
-            display: none; align-items: center; justify-content: center;
+            background: rgba(0,0,0,0.95); z-index: 999;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
         }
-        .modal-box {
-            background: #2d2d2d; padding: 30px; border-radius: 12px;
-            width: 300px; text-align: center; border: 1px solid #444;
+
+        .btn-start {
+            padding: 20px 50px; font-size: 1.5rem; background: var(--primary); color: white;
+            border: none; border-radius: 50px; cursor: pointer; text-transform: uppercase;
+            letter-spacing: 2px; font-weight: bold;
+            box-shadow: 0 0 30px rgba(16, 163, 127, 0.5);
+            animation: pulse-green 2s infinite;
         }
-        select { width: 100%; padding: 10px; background: #171717; color: white; border: 1px solid #444; margin-top: 10px; border-radius: 6px; }
-        button.close-btn { margin-top: 20px; background: var(--primary); color: white; border: none; padding: 8px 20px; border-radius: 4px; cursor: pointer; }
+
+        /* STAGE UTAMA */
+        #stage { flex: 1; position: relative; display: flex; align-items: center; justify-content: center; }
+        
+        /* CORE VISUALIZER */
+        .core {
+            width: 180px; height: 180px; border-radius: 50%;
+            background: #1a1a1a; border: 2px solid #333;
+            display: flex; align-items: center; justify-content: center;
+            position: relative; transition: all 0.2s;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+        }
+        .core svg { width: 60px; height: 60px; fill: #555; transition: fill 0.2s; }
+
+        /* STATES */
+        .core.listening { border-color: var(--accent); box-shadow: 0 0 40px rgba(0, 240, 255, 0.2); }
+        .core.listening svg { fill: var(--accent); animation: breathe 2s infinite; }
+
+        .core.thinking { border-color: #ffd700; transform: scale(1.1); }
+        .core.thinking svg { fill: #ffd700; animation: spin 0.5s linear infinite; }
+
+        .core.speaking { border-color: var(--primary); box-shadow: 0 0 50px rgba(16, 163, 127, 0.6); transform: scale(1.05); }
+        .core.speaking svg { fill: var(--primary); }
+
+        /* TEXT LOG */
+        #log-display {
+            position: absolute; bottom: 100px; width: 100%; text-align: center;
+            font-size: 1.2rem; color: #888; font-weight: 500; min-height: 30px;
+        }
+
+        /* SETTINGS */
+        #modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 1000; display: none; align-items: center; justify-content: center; }
+        .modal-box { background: #222; padding: 25px; border-radius: 10px; width: 300px; border: 1px solid #444; text-align: center; }
+        .api-input { width: 100%; padding: 10px; background: #111; border: 1px solid #444; color: white; border-radius: 5px; margin: 10px 0; box-sizing: border-box; }
+        .btn-save { background: var(--primary); color: white; border: none; padding: 10px; width: 100%; border-radius: 5px; cursor: pointer; font-weight: bold; }
+
+        @keyframes pulse-green { 0% { box-shadow: 0 0 0 0 rgba(16,163,127,0); } 70% { box-shadow: 0 0 30px rgba(16,163,127,0); } 100% { box-shadow: 0 0 0 0 rgba(16,163,127,0); } }
+        @keyframes breathe { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
 
     </style>
 </head>
 <body>
 
-    <header>
-        <div class="brand">
-            <span style="color:white;">●</span> Qwen Voice
-        </div>
-        <div onclick="document.getElementById('settings-modal').style.display='flex'" style="color:#666; cursor:pointer;">⚙️</div>
-    </header>
+    <div id="start-overlay">
+        <button class="btn-start" onclick="startApp()">MULAI CEPAT</button>
+        <div style="color:#666; margin-top:15px;">Mode Suara Turbo - Tanpa Delay</div>
+    </div>
 
-    <div class="main-stage">
-        
-        <!-- Log Chat (Background) -->
-        <div id="chat-log">
-            <div class="log-item">Siap untuk berkomunikasi suara...</div>
-        </div>
-
-        <!-- Teks Status -->
-        <div class="status-display" id="status-display">
-            <div class="status-title" id="status-title">OFFLINE</div>
-            <div class="status-sub" id="status-sub">Klik tombol untuk mulai</div>
-        </div>
-
-        <!-- Visualizer (Hanya saat bicara) -->
-        <div class="wave-container" id="wave-container">
-            <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
-        </div>
-
-        <!-- Tombol Utama -->
-        <div class="mic-button-large" id="main-btn">
+    <div id="stage">
+        <div class="core" id="visual-core">
             <svg viewBox="0 0 24 24">
                 <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
                 <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
@@ -167,234 +95,190 @@
                 <line x1="8" y1="23" x2="16" y2="23"></line>
             </svg>
         </div>
-
     </div>
 
-    <!-- Modal Settings Suara -->
-    <div id="settings-modal">
+    <div id="log-display">Menunggu...</div>
+
+    <div id="modal">
         <div class="modal-box">
-            <h3 style="margin-top:0">Pengaturan Suara</h3>
-            <select id="voice-selector"></select>
-            <button class="close-btn" onclick="document.getElementById('settings-modal').style.display='none'">Tutup</button>
+            <h3>Pengaturan</h3>
+            <input type="password" id="api-key" class="api-input" placeholder="Groq API Key (gsk_...)">
+            <button class="btn-save" onclick="saveSettings()">SIMPAN</button>
+            <div onclick="document.getElementById('modal').style.display='none'" style="margin-top:10px; cursor:pointer; color:#666;">Tutup</div>
         </div>
     </div>
 
     <script>
-        /* 
-         * ENGINE: KONVERASI SUARA PENUH
-         * Flow: Idle -> Listen -> Process -> Speak -> (Auto) Listen
-         */
-
-        // --- 1. VOICE ENGINE (TTS) ---
-        const synth = window.speechSynthesis;
-        let voices = [];
-        let bestVoice = null;
-
-        function initVoices() {
-            voices = synth.getVoices();
-            const idVoices = voices.filter(v => v.lang.startsWith('id-ID'));
-            
-            // Urutkan: Google > Microsoft > Lainnya
-            idVoices.sort((a, b) => {
-                const na = a.name.toLowerCase();
-                const nb = b.name.toLowerCase();
-                if (na.includes('google')) return -1;
-                if (nb.includes('google')) return 1;
-                if (na.includes('microsoft')) return -1;
-                if (nb.includes('microsoft')) return 1;
-                return 0;
-            });
-
-            // Isi Dropdown
-            const select = document.getElementById('voice-selector');
-            select.innerHTML = '';
-            idVoices.forEach((v, i) => {
-                const opt = document.createElement('option');
-                opt.value = i; // Index di array voices asli
-                opt.text = v.name;
-                select.appendChild(opt);
-            });
-
-            if(idVoices.length > 0) {
-                bestVoice = idVoices[0];
-                console.log("Voice Terpilih:", bestVoice.name);
-            }
-        }
-
-        if (speechSynthesis.onvoiceschanged !== undefined) {
-            speechSynthesis.onvoiceschanged = initVoices;
-        }
-        initVoices();
-        setTimeout(initVoices, 1000); // Force load
-
-        // Fungsi Bicara
-        function speak(text) {
-            if (synth.speaking) synth.cancel();
-            // Matikan mic saat AI bicara (Hindari feedback)
-            if (recognition) recognition.stop();
-
-            const utter = new SpeechSynthesisUtterance(text);
-            
-            // Ambil suara dari dropdown atau suara terbaik
-            const select = document.getElementById('voice-selector');
-            if (voices.length > 0) {
-                const idx = select.selectedIndex;
-                // Filter ulang karena array 'voices' is global, select.value index-nya relatif thd filtered list
-                // Simplifikasi: Pakai bestVoice jika user tidak ganti setting, atau cari ulang
-                // Agar simpel, kita pakai bestVoice saja jika belum diset manual
-                utter.voice = bestVoice;
-            }
-
-            utter.pitch = 1.1; // Cewe
-            utter.rate = 0.95; // Natural
-            utter.volume = 1.0;
-
-            // State UI: Speaking
-            setUIState('speaking');
-
-            utter.onend = () => {
-                // SELESAI BICARA -> KEMBALI MENDENGARKAN
-                console.log("Selesai bicara, kembali listen...");
-                setUIState('idle');
-                setTimeout(startListening, 500); // Delay sedikit biar natural
-            };
-
-            synth.speak(utter);
-        }
-
-        // --- 2. LISTENING ENGINE (STT) ---
-        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-        let recognition = null;
+        /* --- ENGINE: TURBO SPEED --- */
         
-        if (SpeechRecognition) {
-            recognition = new SpeechRecognition();
-            recognition.continuous = false; // Kalimat per kalimat dulu, lebih stabil
-            recognition.lang = 'id-ID';
-            recognition.interimResults = false;
-
-            recognition.onstart = () => {
-                setUIState('listening');
-            };
-
-            recognition.onend = () => {
-                // Jangan auto restart di sini.
-                // Biarkan 'speak()' yang mengatur restart via 'onend'.
-                // Kecuali jika user matikan manual.
-            };
-
-            recognition.onresult = (event) => {
-                const text = event.results[0][0].transcript;
-                addLog(text, 'user');
-                processAI(text);
-            };
-
-            recognition.onerror = (e) => {
-                console.error(e);
-                setUIState('idle');
-            };
-        }
-
-        // --- 3. LOGIKA KONTROL ---
+        // 1. CONFIG
+        const API_URL = 'https://api.groq.com/openai/v1/chat/completions';
+        const MODEL = 'llama-3.3-70b-versatile'; // Model yang sangat cepat
+        const SPEECH_RATE = 1.2; // 1.2x Lebih Cepat dari normal (1.0)
+        
+        let API_KEY = localStorage.getItem('qwen_turbo_key') || '';
+        let chatHistory = [];
         let isActive = false;
 
-        function startListening() {
-            if (!recognition || isActive === 'speaking') return;
-            try {
-                recognition.start();
-                isActive = true;
-                setUIState('listening');
-            } catch(e) { console.log("Sudah listening"); }
+        // DOM
+        const core = document.getElementById('visual-core');
+        const log = document.getElementById('log-display');
+        const modal = document.getElementById('modal');
+        const keyInput = document.getElementById('api-key');
+
+        if (!API_KEY) modal.style.display = 'flex';
+        else keyInput.value = API_KEY;
+
+        // 2. VOICE ENGINE (SPEED TUNED)
+        const synth = window.speechSynthesis;
+        let bestVoice = null;
+
+        function loadVoice() {
+            const v = synth.getVoices();
+            const idV = v.filter(x => x.lang === 'id-ID');
+            if (idV.length > 0) bestVoice = idV[0];
+        }
+        if (speechSynthesis.onvoiceschanged) speechSynthesis.onvoiceschanged = loadVoice;
+        loadVoice();
+
+        function speak(text) {
+            if (synth.speaking) synth.cancel();
+            const u = new SpeechSynthesisUtterance(text);
+            if (bestVoice) u.voice = bestVoice;
+            
+            // PENGATURAN KECEPATAN (TURBO)
+            u.pitch = 1.1; // Sedikit tinggi biar jelas walaupun cepat
+            u.rate = SPEECH_RATE; // CEPAT (1.2x)
+            
+            synth.speak(u);
         }
 
-        function stopListening() {
-            if (!recognition) return;
-            try {
-                recognition.stop();
-                isActive = false;
-            } catch(e) {}
-        }
+        // 3. LISTENING ENGINE
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        const recognition = new SpeechRecognition();
+        recognition.continuous = false;
+        recognition.lang = 'id-ID';
+        recognition.interimResults = false;
 
-        // Tombol Utama
-        const mainBtn = document.getElementById('main-btn');
+        recognition.onstart = () => { setVisual('listening'); };
+        recognition.onend = () => { /* Jangan lakukan apa-apa di sini, biarkan 'process' yang handle flow */ };
         
-        mainBtn.addEventListener('click', () => {
-            if (isActive) {
-                // MATIKAN
-                stopListening();
-                if (synth.speaking) synth.cancel();
-                setUIState('offline');
-                isActive = false;
+        recognition.onresult = (e) => {
+            const text = e.results[0][0].transcript;
+            if (!text) return;
+            
+            log.innerText = "Kamu: " + text;
+            processAI(text);
+        };
+
+        // 4. LOGIC & FLOW (TANPA DELAY)
+        async function processAI(text) {
+            if (!API_KEY) {
+                log.innerText = "Error: Masukkan API Key dulu.";
+                modal.style.display = 'flex';
+                setVisual('idle');
+                return;
+            }
+
+            setVisual('thinking');
+            chatHistory.push({ role: "user", content: text });
+            chatHistory.push({ role: "assistant", content: "..." }); // Placeholder biar gantian
+
+            const payload = [
+                { role: "system", content: "Kamu AI yang super cepat, ringkas, dan to the point." },
+                ...chatHistory.slice(-10)
+            ];
+
+            try {
+                const res = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${API_KEY}`, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ messages: payload, model: MODEL, temperature: 0.5 })
+                });
+                const data = await res.json();
+                
+                if (data.choices && data.choices.length > 0) {
+                    const reply = data.choices[0].message.content;
+                    
+                    // Update History
+                    chatHistory[chatHistory.length-1] = { role: "assistant", content: reply };
+                    
+                    log.innerText = reply;
+                    speak(reply);
+                    setVisual('speaking');
+                } else {
+                    throw new Error("No response");
+                }
+            } catch (err) {
+                log.innerText = "Error: " + err.message;
+                setVisual('idle');
+                startListening(); // Retry if error
+            }
+        }
+
+        // VISUAL STATE MANAGER
+        function setVisual(state) {
+            core.className = 'core'; // Reset
+            if (state === 'listening') {
+                core.classList.add('listening');
+            } else if (state === 'thinking') {
+                core.classList.add('thinking');
+            } else if (state === 'speaking') {
+                core.classList.add('speaking');
             } else {
-                // NYALAKAN
+                // Idle
+            }
+        }
+
+        function startApp() {
+            document.getElementById('start-overlay').style.display = 'none';
+            isActive = true;
+            startListening();
+        }
+
+        function startListening() {
+            if (!isActive) return;
+            try { recognition.start(); } catch(e) {}
+        }
+
+        function speak(text) {
+            // Saat AI bicara, matikan mic biar gak noise
+            try { recognition.stop(); } catch(e) {}
+            speak(text);
+        }
+
+        // EVENT HANDLERS
+        // Override fungsi speak bawaan dengan logika flow otomatis
+        const originalSpeak = window.speechSynthesis.prototype.speak;
+        window.speechSynthesis.prototype.speak = function(utterance) {
+            originalSpeak.call(this, utterance);
+            
+            // KUNCI KECEPATAN: Selesai bicara -> Langsung dengar (Delay 0ms)
+            utterance.onend = function() {
+                log.innerText = ""; // Clear text biar fokus ke dengar
+                setTimeout(startListening, 0); // TANPA DELAY!
+            };
+        };
+
+        function saveSettings() {
+            const k = keyInput.value.trim();
+            if(k) {
+                API_KEY = k;
+                localStorage.setItem('qwen_turbo_key', k);
+                modal.style.display = 'none';
+                if(!isActive) startApp();
+            }
+        }
+
+        // Klik Core untuk manual toggle (Opsional)
+        core.addEventListener('click', () => {
+            if (isActive && core.classList.contains('listening')) {
+                core.classList.remove('listening');
+                recognition.stop();
+            } else {
                 startListening();
             }
         });
-
-        // Update UI State
-        function setUIState(state) {
-            const btn = document.getElementById('main-btn');
-            const title = document.getElementById('status-title');
-            const sub = document.getElementById('status-sub');
-            const wave = document.getElementById('wave-container');
-
-            // Reset
-            btn.className = 'mic-button-large';
-            wave.style.opacity = '0';
-
-            if (state === 'listening') {
-                btn.classList.add('listening');
-                title.innerText = "MENDENGARKAN...";
-                title.style.color = "var(--listening-color)";
-                sub.innerText = "Silakan bicara...";
-                isActive = true;
-            } 
-            else if (state === 'speaking') {
-                btn.classList.add('speaking');
-                title.innerText = "BERBICARA";
-                title.style.color = "var(--speaking-color)";
-                sub.innerText = "Qwen sedang menjawab...";
-                wave.style.opacity = '1';
-                isActive = 'speaking';
-            } 
-            else if (state === 'offline') {
-                title.innerText = "OFFLINE";
-                title.style.color = "#888";
-                sub.innerText = "Klik tombol untuk mulai";
-            }
-            else { // Idle
-                title.innerText = "SIAP";
-                title.style.color = "#888";
-                sub.innerText = "Menunggu suara...";
-            }
-        }
-
-        function addLog(text, sender) {
-            const log = document.getElementById('chat-log');
-            const div = document.createElement('div');
-            div.className = `log-item ${sender}`;
-            div.innerText = (sender === 'user' ? "Kamu: " : "Qwen: ") + text;
-            log.appendChild(div);
-            log.scrollTop = log.scrollHeight;
-        }
-
-        // OTAK AI
-        function processAI(text) {
-            const t = text.toLowerCase();
-            let reply = "";
-
-            if (t.match(/halo|hai|pagi|siang|sore|malam/)) reply = "Halo. Apa yang bisa saya bantu dengan suara hari ini?";
-            else if (t.match(/siapa|nama|kamu/)) reply = "Saya adalah Qwen. Asisten virtual yang suka mengobrol.";
-            else if (t.match(/jam|waktu/)) {
-                const d = new Date();
-                reply = `Sekarang pukul ${d.getHours()} lewat ${d.getMinutes()}.`;
-            }
-            else if (t.match(/terima kasih|makasih/)) reply = "Sama-sama.";
-            else if (t.match(/bisa apa/)) reply = "Saya bisa mengobrol, bercanda, dan menjawab pertanyaan sederhana.";
-            else if (t.match(/lagi|capek|sedih/)) reply = "Jangan sedih ya. Ceritakan sama saya, saya siap mendengar.";
-            else reply = "Maaf, suaranya kurang jelas atau saya belum paham maksudmu. Bisa ulangi?";
-
-            speak(reply);
-        }
 
     </script>
 </body>
