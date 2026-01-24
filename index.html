@@ -3,422 +3,398 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Qwen AI - Voice Edition</title>
+    <title>Qwen AI - Voice Chat</title>
     <style>
-        /* STYLE MENIRU QWEN.AI EXACTLY */
         :root {
-            --qwen-bg: #171717;
-            --qwen-sidebar: #171717;
-            --qwen-input: #2d2d2d;
-            --qwen-text: #ececec;
-            --qwen-subtext: #b4b4b4;
-            --qwen-primary: #10a37f; /* Hijau Khas Qwen */
-            --qwen-primary-hover: #1a7f64;
-            --user-bubble: #2f2f2f;
-            --ai-bubble: #343541;
-            --border-color: #424242;
+            --bg-dark: #171717;
+            --primary: #10a37f; /* Qwen Green */
+            --listening-color: #00f0ff; /* Biru saat dengar */
+            --speaking-color: #10a37f; /* Hijau saat bicara */
+            --text-main: #ececec;
+            --text-sub: #666;
         }
-
-        * { box-sizing: border-box; user-select: none; -webkit-tap-highlight-color: transparent; }
 
         body, html {
             margin: 0; padding: 0; width: 100%; height: 100%;
-            background-color: var(--qwen-bg);
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            color: var(--qwen-text);
-            display: flex; flex-direction: column;
+            background-color: var(--bg-dark);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            color: var(--text-main);
+            display: flex; flex-direction: column; overflow: hidden;
         }
 
-        /* Header */
+        /* Header Kecil */
         header {
-            height: 60px;
-            display: flex;
-            align-items: center;
-            padding: 0 20px;
-            border-bottom: 1px solid #333;
-            background-color: var(--qwen-bg);
-            justify-content: space-between;
+            position: absolute; top: 0; left: 0; width: 100%;
+            height: 60px; display: flex; align-items: center; justify-content: space-between;
+            padding: 0 20px; z-index: 10; border-bottom: 1px solid #333;
+        }
+        .brand { font-weight: bold; color: var(--primary); display: flex; align-items: center; gap: 8px; }
+
+        /* Layar Utama */
+        .main-stage {
+            flex: 1; position: relative; display: flex;
+            flex-direction: column; align-items: center; justify-content: center;
         }
 
-        .brand {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            font-weight: 700;
-            font-size: 1.2rem;
-            color: var(--qwen-text);
+        /* STATUS BESAR (Penting untuk Mode Suara) */
+        .status-display {
+            text-align: center;
+            margin-bottom: 40px;
+            z-index: 5;
+            transition: all 0.3s;
         }
 
-        .brand-icon {
-            width: 32px; height: 32px;
-            fill: var(--qwen-text);
+        .status-title {
+            font-size: 1.2rem; font-weight: 600; margin-bottom: 5px;
+            text-transform: uppercase; letter-spacing: 2px;
         }
 
-        .avatar-profile {
-            width: 36px; height: 36px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 1px solid #444;
-            cursor: pointer;
+        .status-sub {
+            font-size: 0.9rem; color: var(--text-sub);
         }
 
-        /* Chat Container */
-        #chat-container {
-            flex: 1;
-            overflow-y: auto;
-            padding: 20px 0;
-            display: flex;
-            flex-direction: column;
-            gap: 24px;
-            max-width: 800px;
-            width: 100%;
-            margin: 0 auto;
+        /* Visualisasi Gelombang Suara (Hanya CSS) */
+        .wave-container {
+            display: flex; align-items: center; justify-content: center; gap: 6px; height: 40px;
+            opacity: 0; transition: opacity 0.3s;
         }
+        .bar { width: 6px; background: var(--primary); border-radius: 4px; animation: none; }
 
-        .message-row {
-            display: flex;
-            gap: 16px;
-            padding: 0 20px;
-            width: 100%;
+        /* Tombol Mikrofon Besar */
+        .mic-button-large {
+            width: 80px; height: 80px; border-radius: 50%;
+            background: #2d2d2d; border: 2px solid #444;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            position: relative; z-index: 20;
         }
+        .mic-button-large svg { width: 30px; height: 30px; fill: #888; transition: fill 0.3s; }
 
-        .avatar-small {
-            width: 32px; height: 32px;
-            border-radius: 50%;
-            flex-shrink: 0;
+        /* States */
+        /* 1. Listening */
+        .mic-button-large.listening {
+            border-color: var(--listening-color);
+            background: #1a1a1a;
+            animation: pulse-blue 2s infinite;
         }
-
-        .message-content {
-            display: flex;
-            flex-direction: column;
-            max-width: 85%;
-            gap: 4px;
-        }
-
-        .sender-name {
-            font-size: 0.75rem;
-            font-weight: 600;
-            color: var(--qwen-text);
-            line-height: 1.5;
-        }
-
-        .message-bubble {
-            padding: 10px 16px;
-            border-radius: 12px;
-            font-size: 0.95rem;
-            line-height: 1.6;
-            word-wrap: break-word;
-            white-space: pre-wrap;
-        }
-
-        /* AI Style */
-        .message-row.ai { justify-content: flex-start; }
-        .message-row.ai .message-bubble {
-            background-color: var(--ai-bubble);
-            border-top-left-radius: 2px;
-            color: var(--qwen-text);
-        }
-        .message-row.ai .sender-name { color: var(--qwen-text); }
-
-        /* User Style */
-        .message-row.user { justify-content: flex-end; }
-        .message-row.user .avatar-small { display: none; } /* User no avatar in Qwen style usually */
-        .message-row.user .message-content { align-items: flex-end; }
-        .message-row.user .message-bubble {
-            background-color: var(--user-bubble);
-            border-top-right-radius: 2px;
-            color: var(--qwen-text);
-            border: 1px solid #444;
-        }
-
-        /* Input Area */
-        .input-container {
-            padding: 24px;
-            max-width: 800px;
-            width: 100%;
-            margin: 0 auto;
-        }
-
-        .input-wrapper {
-            background-color: var(--qwen-input);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 12px;
-            display: flex;
-            align-items: flex-end;
-            gap: 10px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            transition: border-color 0.2s;
-        }
-
-        .input-wrapper:focus-within {
-            border-color: var(--qwen-primary);
-        }
-
-        textarea {
-            flex: 1;
-            background: transparent;
-            border: none;
-            color: var(--qwen-text);
-            font-family: inherit;
-            font-size: 1rem;
-            resize: none;
-            max-height: 150px;
-            outline: none;
-            line-height: 1.5;
-            padding: 4px 0;
-        }
-
-        textarea::placeholder { color: #666; }
-
-        .btn-icon {
-            width: 32px; height: 32px;
-            border-radius: 6px;
-            border: none;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: background 0.2s;
-            background: transparent;
-            color: var(--qwen-subtext);
-        }
-
-        .btn-icon:hover { background-color: #3e3e3e; color: var(--qwen-text); }
+        .mic-button-large.listening svg { fill: var(--listening-color); }
         
-        .btn-mic {
-            width: 36px; height: 36px;
+        /* 2. Speaking */
+        .mic-button-large.speaking {
+            border-color: var(--speaking-color);
+            background: var(--speaking-color);
+            transform: scale(1.1);
+            box-shadow: 0 0 30px rgba(16, 163, 127, 0.4);
         }
+        .mic-button-large.speaking svg { fill: white; }
 
-        .btn-mic.listening {
-            background-color: var(--qwen-primary);
-            color: white;
-            animation: pulse-green 1.5s infinite;
+        /* Chat Transkrip (Background) */
+        #chat-log {
+            position: absolute; top: 80px; bottom: 100px; left: 0; right: 0;
+            overflow-y: auto; padding: 20px;
+            display: flex; flex-direction: column; gap: 15px;
+            opacity: 0.3; pointer-events: none; /* Supaya tidak ganggu */
+            align-items: center;
         }
-
-        .btn-send {
-            background-color: var(--qwen-primary);
-            color: white;
-        }
-        .btn-send:hover { background-color: var(--qwen-primary-hover); }
-        .btn-send svg { fill: white; }
+        .log-item { font-size: 0.9rem; color: #888; max-width: 80%; text-align: center; }
+        .log-item.ai { color: var(--primary); font-weight: 500; }
 
         /* Animations */
-        @keyframes pulse-green {
-            0% { box-shadow: 0 0 0 0 rgba(16, 163, 127, 0.7); }
-            70% { box-shadow: 0 0 0 10px rgba(16, 163, 127, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(16, 163, 127, 0); }
+        @keyframes pulse-blue {
+            0% { box-shadow: 0 0 0 0 rgba(0, 240, 255, 0.4); }
+            70% { box-shadow: 0 0 0 20px rgba(0, 240, 255, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(0, 240, 255, 0); }
         }
+        
+        @keyframes wave { 0%, 100% { height: 10px; } 50% { height: 30px; } }
+        
+        .speaking .wave-container { opacity: 1; }
+        .speaking .bar { animation: wave 0.5s infinite ease-in-out; }
+        .bar:nth-child(2) { animation-delay: 0.1s; }
+        .bar:nth-child(3) { animation-delay: 0.2s; }
+        .bar:nth-child(4) { animation-delay: 0.3s; }
+        .bar:nth-child(5) { animation-delay: 0.4s; }
 
-        /* Mobile Adjustments */
-        @media (max-width: 600px) {
-            .message-row { padding: 0 12px; }
-            header { padding: 0 12px; }
-            .brand span { display: none; } /* Hide text on small screens */
+        /* Settings Overlay */
+        #settings-modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8); z-index: 100;
+            display: none; align-items: center; justify-content: center;
         }
+        .modal-box {
+            background: #2d2d2d; padding: 30px; border-radius: 12px;
+            width: 300px; text-align: center; border: 1px solid #444;
+        }
+        select { width: 100%; padding: 10px; background: #171717; color: white; border: 1px solid #444; margin-top: 10px; border-radius: 6px; }
+        button.close-btn { margin-top: 20px; background: var(--primary); color: white; border: none; padding: 8px 20px; border-radius: 4px; cursor: pointer; }
+
     </style>
 </head>
 <body>
 
     <header>
         <div class="brand">
-            <!-- SVG Icon Qwen Sederhana -->
-            <svg class="brand-icon" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 2a10 10 0 1 0 10 10 4 4 0 0 1-4 4 4 4 0 0 1-4 4"/>
-            </svg>
-            <span>Qwen AI</span>
+            <span style="color:white;">●</span> Qwen Voice
         </div>
-        <!-- Avatar Cewe Profesional (URL Stable) -->
-        <img src="https://i.pravatar.cc/150?img=44" class="avatar-profile" alt="AI" onerror="this.src='https://via.placeholder.com/100/10a37f/FFFFFF/?text=Q'">
+        <div onclick="document.getElementById('settings-modal').style.display='flex'" style="color:#666; cursor:pointer;">⚙️</div>
     </header>
 
-    <div id="chat-container">
-        <!-- Pesan Pembuka -->
-        <div class="message-row ai">
-            <img src="https://i.pravatar.cc/150?img=44" class="avatar-small" onerror="this.src='https://via.placeholder.com/50/10a37f/FFFFFF/?text=Q'">
-            <div class="message-content">
-                <div class="sender-name">Qwen</div>
-                <div class="message-bubble">Halo. Saya adalah asisten AI berbasis bahasa Indonesia. Saya dapat membantu Anda menjawab pertanyaan, membuat teks, atau sekadar mengobrol. Silakan ketik atau gunakan mikrofon.</div>
-            </div>
+    <div class="main-stage">
+        
+        <!-- Log Chat (Background) -->
+        <div id="chat-log">
+            <div class="log-item">Siap untuk berkomunikasi suara...</div>
         </div>
+
+        <!-- Teks Status -->
+        <div class="status-display" id="status-display">
+            <div class="status-title" id="status-title">OFFLINE</div>
+            <div class="status-sub" id="status-sub">Klik tombol untuk mulai</div>
+        </div>
+
+        <!-- Visualizer (Hanya saat bicara) -->
+        <div class="wave-container" id="wave-container">
+            <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
+        </div>
+
+        <!-- Tombol Utama -->
+        <div class="mic-button-large" id="main-btn">
+            <svg viewBox="0 0 24 24">
+                <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+                <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                <line x1="12" y1="19" x2="12" y2="23"></line>
+                <line x1="8" y1="23" x2="16" y2="23"></line>
+            </svg>
+        </div>
+
     </div>
 
-    <div class="input-container">
-        <div class="input-wrapper">
-            <textarea id="user-input" rows="1" placeholder="Kirim pesan ke Qwen..."></textarea>
-            
-            <button class="btn-icon" id="btn-attach" title="Lampiran (Demo)">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-1.41-1.41l-9.19-9.19a6 6 0 0 1 1.41-1.41l9.19-9.19a6 6 0 0 1 1.41 1.41l9.19 9.19a6 6 0 0 1 1.41-1.41l9.19-9.19a6 6 0 0 1 1.41-1.41z"></path>
-                </svg>
-            </button>
-            
-            <button class="btn-icon btn-mic" id="btn-mic" title="Gunakan Suara">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
-                    <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
-                    <line x1="12" y1="19" x2="12" y2="23"></line>
-                    <line x1="8" y1="23" x2="16" y2="23"></line>
-                </svg>
-            </button>
-
-            <button class="btn-icon btn-send" id="btn-send" title="Kirim">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <line x1="22" y1="2" x2="11" y2="13"></line>
-                    <polygon points="22 2 15 22 11 13"></polygon>
-                </svg>
-            </button>
+    <!-- Modal Settings Suara -->
+    <div id="settings-modal">
+        <div class="modal-box">
+            <h3 style="margin-top:0">Pengaturan Suara</h3>
+            <select id="voice-selector"></select>
+            <button class="close-btn" onclick="document.getElementById('settings-modal').style.display='none'">Tutup</button>
         </div>
     </div>
 
     <script>
         /* 
-         * ENGINE: QWEN CLONE VOICE
-         * Menggabungkan UI Qwen dengan Voice Engine Pro Indonesia
+         * ENGINE: KONVERASI SUARA PENUH
+         * Flow: Idle -> Listen -> Process -> Speak -> (Auto) Listen
          */
 
-        const chatContainer = document.getElementById('chat-container');
-        const userInput = document.getElementById('user-input');
-        const btnMic = document.getElementById('btn-mic');
-        const btnSend = document.getElementById('btn-send');
-
-        // --- 1. SMART VOICE SELECTOR (SAMA SEPERTI SEBELUMNYA) ---
+        // --- 1. VOICE ENGINE (TTS) ---
         const synth = window.speechSynthesis;
+        let voices = [];
         let bestVoice = null;
 
-        function loadBestVoice() {
-            const voices = synth.getVoices();
-            const idVoices = voices.filter(v => v.lang === 'id-ID');
+        function initVoices() {
+            voices = synth.getVoices();
+            const idVoices = voices.filter(v => v.lang.startsWith('id-ID'));
             
-            if (idVoices.length > 0) {
-                idVoices.sort((a, b) => {
-                    const nameA = a.name.toLowerCase();
-                    const nameB = b.name.toLowerCase();
-                    // Prioritas: Google > Microsoft > Lainnya
-                    if (nameA.includes('google')) return -1;
-                    if (nameB.includes('google')) return 1;
-                    if (nameA.includes('microsoft')) return -1;
-                    if (nameB.includes('microsoft')) return 1;
-                    return 0;
-                });
+            // Urutkan: Google > Microsoft > Lainnya
+            idVoices.sort((a, b) => {
+                const na = a.name.toLowerCase();
+                const nb = b.name.toLowerCase();
+                if (na.includes('google')) return -1;
+                if (nb.includes('google')) return 1;
+                if (na.includes('microsoft')) return -1;
+                if (nb.includes('microsoft')) return 1;
+                return 0;
+            });
+
+            // Isi Dropdown
+            const select = document.getElementById('voice-selector');
+            select.innerHTML = '';
+            idVoices.forEach((v, i) => {
+                const opt = document.createElement('option');
+                opt.value = i; // Index di array voices asli
+                opt.text = v.name;
+                select.appendChild(opt);
+            });
+
+            if(idVoices.length > 0) {
                 bestVoice = idVoices[0];
                 console.log("Voice Terpilih:", bestVoice.name);
             }
         }
 
         if (speechSynthesis.onvoiceschanged !== undefined) {
-            speechSynthesis.onvoiceschanged = loadBestVoice;
+            speechSynthesis.onvoiceschanged = initVoices;
         }
-        loadBestVoice();
-        setTimeout(loadBestVoice, 1000); // Retry force load
+        initVoices();
+        setTimeout(initVoices, 1000); // Force load
 
-        function speakAI(text) {
-            if (!text) return;
+        // Fungsi Bicara
+        function speak(text) {
             if (synth.speaking) synth.cancel();
+            // Matikan mic saat AI bicara (Hindari feedback)
+            if (recognition) recognition.stop();
 
             const utter = new SpeechSynthesisUtterance(text);
-            if (bestVoice) utter.voice = bestVoice;
             
-            // Tuning agar tidak robotik
-            utter.pitch = 1.1; // Sedikit tinggi (Cewe)
-            utter.rate = 0.95;  // Sedikit lambat (Wajar)
+            // Ambil suara dari dropdown atau suara terbaik
+            const select = document.getElementById('voice-selector');
+            if (voices.length > 0) {
+                const idx = select.selectedIndex;
+                // Filter ulang karena array 'voices' is global, select.value index-nya relatif thd filtered list
+                // Simplifikasi: Pakai bestVoice jika user tidak ganti setting, atau cari ulang
+                // Agar simpel, kita pakai bestVoice saja jika belum diset manual
+                utter.voice = bestVoice;
+            }
+
+            utter.pitch = 1.1; // Cewe
+            utter.rate = 0.95; // Natural
             utter.volume = 1.0;
+
+            // State UI: Speaking
+            setUIState('speaking');
+
+            utter.onend = () => {
+                // SELESAI BICARA -> KEMBALI MENDENGARKAN
+                console.log("Selesai bicara, kembali listen...");
+                setUIState('idle');
+                setTimeout(startListening, 500); // Delay sedikit biar natural
+            };
 
             synth.speak(utter);
         }
 
-        // --- 2. SPEECH RECOGNITION ---
+        // --- 2. LISTENING ENGINE (STT) ---
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-        const recognition = new SpeechRecognition();
-
-        recognition.continuous = false;
-        recognition.lang = 'id-ID';
-        recognition.interimResults = false;
-
-        recognition.onstart = () => { btnMic.classList.add('listening'); };
-        recognition.onend = () => { btnMic.classList.remove('listening'); };
+        let recognition = null;
         
-        recognition.onresult = (event) => {
-            const text = event.results[0][0].transcript;
-            userInput.value = text;
-            handleSend();
-        };
+        if (SpeechRecognition) {
+            recognition = new SpeechRecognition();
+            recognition.continuous = false; // Kalimat per kalimat dulu, lebih stabil
+            recognition.lang = 'id-ID';
+            recognition.interimResults = false;
 
-        recognition.onerror = (e) => {
-            console.error(e);
-            btnMic.classList.remove('listening');
-        };
+            recognition.onstart = () => {
+                setUIState('listening');
+            };
 
-        btnMic.addEventListener('click', () => {
-            try { recognition.start(); } catch(e){}
-        });
+            recognition.onend = () => {
+                // Jangan auto restart di sini.
+                // Biarkan 'speak()' yang mengatur restart via 'onend'.
+                // Kecuali jika user matikan manual.
+            };
 
-        // --- 3. UI LOGIC ---
-        function addMessage(text, sender) {
-            const div = document.createElement('div');
-            div.className = `message-row ${sender}`;
-            
-            const avatarUrl = "https://i.pravatar.cc/150?img=44";
-            
-            if (sender === 'ai') {
-                div.innerHTML = `
-                    <img src="${avatarUrl}" class="avatar-small" onerror="this.src='https://via.placeholder.com/50/10a37f/FFFFFF/?text=Q'">
-                    <div class="message-content">
-                        <div class="sender-name">Qwen</div>
-                        <div class="message-bubble">${text}</div>
-                    </div>
-                `;
-            } else {
-                div.innerHTML = `
-                    <div class="message-content">
-                        <div class="message-bubble">${text}</div>
-                    </div>
-                `;
-            }
-            chatContainer.appendChild(div);
-            chatContainer.scrollTop = chatContainer.scrollHeight;
+            recognition.onresult = (event) => {
+                const text = event.results[0][0].transcript;
+                addLog(text, 'user');
+                processAI(text);
+            };
+
+            recognition.onerror = (e) => {
+                console.error(e);
+                setUIState('idle');
+            };
         }
 
-        function processAI(input) {
-            const text = input.toLowerCase();
+        // --- 3. LOGIKA KONTROL ---
+        let isActive = false;
+
+        function startListening() {
+            if (!recognition || isActive === 'speaking') return;
+            try {
+                recognition.start();
+                isActive = true;
+                setUIState('listening');
+            } catch(e) { console.log("Sudah listening"); }
+        }
+
+        function stopListening() {
+            if (!recognition) return;
+            try {
+                recognition.stop();
+                isActive = false;
+            } catch(e) {}
+        }
+
+        // Tombol Utama
+        const mainBtn = document.getElementById('main-btn');
+        
+        mainBtn.addEventListener('click', () => {
+            if (isActive) {
+                // MATIKAN
+                stopListening();
+                if (synth.speaking) synth.cancel();
+                setUIState('offline');
+                isActive = false;
+            } else {
+                // NYALAKAN
+                startListening();
+            }
+        });
+
+        // Update UI State
+        function setUIState(state) {
+            const btn = document.getElementById('main-btn');
+            const title = document.getElementById('status-title');
+            const sub = document.getElementById('status-sub');
+            const wave = document.getElementById('wave-container');
+
+            // Reset
+            btn.className = 'mic-button-large';
+            wave.style.opacity = '0';
+
+            if (state === 'listening') {
+                btn.classList.add('listening');
+                title.innerText = "MENDENGARKAN...";
+                title.style.color = "var(--listening-color)";
+                sub.innerText = "Silakan bicara...";
+                isActive = true;
+            } 
+            else if (state === 'speaking') {
+                btn.classList.add('speaking');
+                title.innerText = "BERBICARA";
+                title.style.color = "var(--speaking-color)";
+                sub.innerText = "Qwen sedang menjawab...";
+                wave.style.opacity = '1';
+                isActive = 'speaking';
+            } 
+            else if (state === 'offline') {
+                title.innerText = "OFFLINE";
+                title.style.color = "#888";
+                sub.innerText = "Klik tombol untuk mulai";
+            }
+            else { // Idle
+                title.innerText = "SIAP";
+                title.style.color = "#888";
+                sub.innerText = "Menunggu suara...";
+            }
+        }
+
+        function addLog(text, sender) {
+            const log = document.getElementById('chat-log');
+            const div = document.createElement('div');
+            div.className = `log-item ${sender}`;
+            div.innerText = (sender === 'user' ? "Kamu: " : "Qwen: ") + text;
+            log.appendChild(div);
+            log.scrollTop = log.scrollHeight;
+        }
+
+        // OTAK AI
+        function processAI(text) {
+            const t = text.toLowerCase();
             let reply = "";
 
-            // Logika Sederhana (Karena tanpa API Server)
-            if (text.match(/halo|hai|pagi|siang|sore|malam/)) reply = "Halo! Apa yang bisa saya bantu hari ini?";
-            else if (text.match(/siapa|nama|kamu/)) reply = "Saya adalah Qwen, model bahasa besar dari Alibaba Cloud.";
-            else if (text.match(/jam|waktu|tanggal/)) reply = "Saat ini adalah " + new Date().toLocaleTimeString('id-ID') + " WIB.";
-            else if (text.match(/terima kasih|makasih/)) reply = "Sama-sama! Senang bisa membantu.";
-            else if (text.match(/bisa apa|fitur/)) reply = "Saya bisa menjawab pertanyaan umum, menulis teks, dan berkomunikasi dalam bahasa Indonesia.";
-            else reply = "Maaf, saya hanya model demo tanpa koneksi internet. Pertanyaan kompleks mungkin tidak bisa saya jawab.";
-
-            addMessage(reply, 'ai');
-            speakAI(reply);
-        }
-
-        function handleSend() {
-            const val = userInput.value.trim();
-            if (!val) return;
-
-            addMessage(val, 'user');
-            userInput.value = '';
-            
-            // Simulasi "Thinking"
-            setTimeout(() => processAI(val), 600);
-        }
-
-        btnSend.addEventListener('click', handleSend);
-        userInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                handleSend();
+            if (t.match(/halo|hai|pagi|siang|sore|malam/)) reply = "Halo. Apa yang bisa saya bantu dengan suara hari ini?";
+            else if (t.match(/siapa|nama|kamu/)) reply = "Saya adalah Qwen. Asisten virtual yang suka mengobrol.";
+            else if (t.match(/jam|waktu/)) {
+                const d = new Date();
+                reply = `Sekarang pukul ${d.getHours()} lewat ${d.getMinutes()}.`;
             }
-        });
+            else if (t.match(/terima kasih|makasih/)) reply = "Sama-sama.";
+            else if (t.match(/bisa apa/)) reply = "Saya bisa mengobrol, bercanda, dan menjawab pertanyaan sederhana.";
+            else if (t.match(/lagi|capek|sedih/)) reply = "Jangan sedih ya. Ceritakan sama saya, saya siap mendengar.";
+            else reply = "Maaf, suaranya kurang jelas atau saya belum paham maksudmu. Bisa ulangi?";
 
-        // Auto resize textarea
-        userInput.addEventListener('input', function() {
-            this.style.height = 'auto';
-            this.style.height = (this.scrollHeight) + 'px';
-        });
+            speak(reply);
+        }
 
     </script>
 </body>
