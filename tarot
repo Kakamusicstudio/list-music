@@ -3,61 +3,579 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simple Live</title>
+    <title>The Wedding of Romeo & Juliet</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Montserrat:wght@300;400;500&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome untuk Ikon -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
     <style>
+        /* --- VARIABEL & RESET --- */
+        :root {
+            --primary-color: #a89f91; /* Warna Emas/Krem */
+            --secondary-color: #5e5044; /* Coklat Tua */
+            --bg-color: #fdfbf7; /* Putih Gading */
+            --text-color: #333;
+            --accent-color: #d4af37;
+            --font-main: 'Cormorant Garamond', serif;
+            --font-body: 'Montserrat', sans-serif;
+        }
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-        body {
-            background-color: #000;
-            overflow: hidden;
-            height: 100vh;
-            width: 100vw;
+
+        html {
+            scroll-behavior: smooth;
         }
-        /* Iframe langsung full screen */
+
+        body {
+            font-family: var(--font-body);
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        /* --- UTILITY CLASSES --- */
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 20px;
+            text-align: center;
+        }
+
+        h1, h2, h3 {
+            font-family: var(--font-main);
+            font-weight: 600;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 12px 30px;
+            background-color: var(--secondary-color);
+            color: white;
+            border-radius: 50px;
+            text-decoration: none;
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            margin-top: 15px;
+        }
+
+        .btn:hover {
+            background-color: var(--accent-color);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        /* --- ANIMASI SCROLL --- */
+        .aos-init {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s ease-out;
+        }
+
+        .aos-animate {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* --- COVER OVERLAY (BUKA UNDANGAN) --- */
+        #cover {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('https://picsum.photos/seed/weddingbg/800/1200');
+            background-size: cover;
+            background-position: center;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            color: white;
+            transition: transform 0.8s ease-in-out;
+        }
+
+        #cover.open {
+            transform: translateY(-100%);
+        }
+
+        .cover-content h2 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            letter-spacing: 2px;
+        }
+
+        .cover-content h1 {
+            font-size: 4rem;
+            margin: 10px 0;
+            font-style: italic;
+        }
+
+        .cover-content p {
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+        }
+
+        /* --- HERO SECTION --- */
+        header {
+            height: 100vh;
+            background: linear-gradient(rgba(255,255,255,0.8), rgba(255,255,255,0.8)), url('https://picsum.photos/seed/flower/800/1200');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed; /* Parallax effect */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .hero-content {
+            background: rgba(255, 255, 255, 0.8);
+            padding: 50px 30px;
+            border: 1px solid var(--primary-color);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        }
+
+        .hero-content p {
+            font-size: 1.1rem;
+            color: var(--secondary-color);
+            margin-bottom: 10px;
+        }
+
+        .hero-content h1 {
+            font-size: 3.5rem;
+            color: var(--secondary-color);
+            margin: 10px 0;
+        }
+
+        /* --- MEMPELAI --- */
+        section {
+            padding: 80px 0;
+        }
+
+        .couple-wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 40px;
+            margin-top: 40px;
+        }
+
+        .couple-card {
+            flex: 1;
+            min-width: 250px;
+        }
+
+        .couple-img {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid var(--accent-color);
+            padding: 5px;
+            margin-bottom: 20px;
+        }
+
+        .couple-name {
+            font-size: 1.8rem;
+            color: var(--secondary-color);
+            margin-bottom: 5px;
+        }
+
+        .couple-parents {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .and-sign {
+            font-family: var(--font-main);
+            font-size: 3rem;
+            color: var(--accent-color);
+        }
+
+        /* --- ACARA & COUNTDOWN --- */
+        .event-card {
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+            margin-bottom: 30px;
+            border-top: 4px solid var(--accent-color);
+        }
+
+        .event-title {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: var(--secondary-color);
+        }
+
+        .event-info {
+            margin-bottom: 20px;
+            font-size: 1rem;
+        }
+
+        .event-info i {
+            color: var(--accent-color);
+            margin-right: 8px;
+        }
+
+        #countdown {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 30px 0;
+        }
+
+        .time-box {
+            background: var(--secondary-color);
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            min-width: 60px;
+        }
+
+        .time-box span {
+            display: block;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .time-box small {
+            font-size: 0.7rem;
+        }
+
+        /* --- LOKASI & RSVP --- */
+        .map-container {
+            margin: 20px 0;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
         iframe {
             width: 100%;
-            height: 100%;
-            border: none;
+            height: 300px;
+            border: 0;
         }
-        
-        /* Loading text sederhana */
-        #loading {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
+
+        .rsvp-form input, .rsvp-form textarea, .rsvp-form select {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-family: var(--font-body);
+        }
+
+        /* --- FOOTER & MUSIC CONTROL --- */
+        footer {
+            background: var(--secondary-color);
             color: white;
-            font-family: sans-serif;
-            font-size: 1.5rem;
-            pointer-events: none;
-            display: none;
+            padding: 40px 20px;
+            font-size: 0.9rem;
+        }
+
+        .music-control {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            cursor: pointer;
+            z-index: 1000;
+            border: 2px solid var(--accent-color);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(212, 175, 55, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(212, 175, 55, 0); }
+        }
+
+        @media (max-width: 768px) {
+            .hero-content h1 { font-size: 2.5rem; }
+            .cover-content h1 { font-size: 3rem; }
+            .couple-wrapper { flex-direction: column; }
+            .and-sign { transform: rotate(90deg); margin: 10px 0; }
         }
     </style>
 </head>
 <body>
 
-    <!-- Iframe Jitsi Langsung -->
-    <!-- Izinkan Kamera, Mic, dan Layar Penuh -->
-    <iframe 
-        src="https://meet.jit.si/TEMAN-NGOBROL-BARENG" 
-        allow="camera; microphone; fullscreen; display-capture; autoplay; clipboard-read; clipboard-write"
-        style="width: 100%; height: 100%;">
-    </iframe>
+    <!-- COVER DEPAN (WAJIB ADA AGAR MUSIK BISA AUTOPLAY) -->
+    <div id="cover">
+        <div class="cover-content">
+            <h2>The Wedding of</h2>
+            <h1>Romeo & Juliet</h1>
+            <p>Sabtu, 25 Desember 2024</p>
+            <p style="font-size: 0.9rem; margin-bottom: 20px;">Kepada Yth.<br>Bapak/Ibu/Saudara/i</p>
+            <button class="btn" onclick="openInvitation()">Buka Undangan <i class="fas fa-envelope-open"></i></button>
+        </div>
+    </div>
 
-    <div id="loading">Memuat...</div>
+    <!-- AUDIO MUSIK (Ganti src dengan link mp3 Anda) -->
+    <!-- Contoh musik bebas royalti -->
+    <audio id="bg-music" loop>
+        <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
+    </audio>
+    
+    <!-- TOMBOL MUSIK -->
+    <div class="music-control" onclick="toggleMusic()">
+        <i class="fas fa-music" id="music-icon"></i>
+    </div>
+
+    <!-- KONTEN UTAMA -->
+    <main>
+        <!-- HERO SECTION -->
+        <header>
+            <div class="container hero-content aos-init">
+                <p>WALIMATUL 'URS</p>
+                <h1>Romeo & Juliet</h1>
+                <p>25 . 12 . 2024</p>
+            </div>
+        </header>
+
+        <!-- AYAT / SALAM -->
+        <section>
+            <div class="container aos-init">
+                <img src="https://picsum.photos/seed/bunga/100/100" style="border-radius: 50%; margin-bottom: 20px; opacity: 0.6;" alt=" dekorasi">
+                <p style="font-style: italic; max-width: 600px; margin: 0 auto; color: #555;">
+                    "Dan di antara tanda-tanda (kebesaran)-Nya ialah Dia menciptakan pasangan-pasangan untukmu dari jenismu sendiri, agar kamu cenderung dan merasa tenteram kepadanya, dan Dia menjadikan di antaramu rasa kasih dan sayang."
+                </p>
+                <br>
+                <p><strong>(QS. Ar-Rum: 21)</strong></p>
+            </div>
+        </section>
+
+        <!-- MEMPELAI -->
+        <section id="couple" style="background-color: white;">
+            <div class="container">
+                <h2 class="aos-init">Mempelai</h2>
+                <div class="couple-wrapper">
+                    <!-- Pria -->
+                    <div class="couple-card aos-init">
+                        <img src="https://picsum.photos/seed/groom/300/300" alt="Groom" class="couple-img">
+                        <h3 class="couple-name">Romeo Putra</h3>
+                        <p class="couple-parents">Putra dari Bpk. Adam & Ibu Hawa</p>
+                        <div style="margin-top: 10px;">
+                            <a href="#" style="color: var(--primary-color); font-size: 1.2rem; margin: 0 5px;"><i class="fab fa-instagram"></i></a>
+                            <a href="#" style="color: var(--primary-color); font-size: 1.2rem; margin: 0 5px;"><i class="fab fa-twitter"></i></a>
+                        </div>
+                    </div>
+
+                    <div class="and-sign aos-init">&</div>
+
+                    <!-- Wanita -->
+                    <div class="couple-card aos-init">
+                        <img src="https://picsum.photos/seed/bride/300/300" alt="Bride" class="couple-img">
+                        <h3 class="couple-name">Juliet Putri</h3>
+                        <p class="couple-parents">Putri dari Bpk. John & Ibu Jane</p>
+                        <div style="margin-top: 10px;">
+                            <a href="#" style="color: var(--primary-color); font-size: 1.2rem; margin: 0 5px;"><i class="fab fa-instagram"></i></a>
+                            <a href="#" style="color: var(--primary-color); font-size: 1.2rem; margin: 0 5px;"><i class="fab fa-tiktok"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- DETAIL ACARA -->
+        <section id="event">
+            <div class="container">
+                <h2 class="aos-init" style="margin-bottom: 30px;">Rangkaian Acara</h2>
+                
+                <div class="event-card aos-init">
+                    <h3 class="event-title">Akad Nikah</h3>
+                    <div class="event-info">
+                        <i class="far fa-calendar-alt"></i> Sabtu, 25 Desember 2024
+                    </div>
+                    <div class="event-info">
+                        <i class="far fa-clock"></i> 08:00 WIB - Selesai
+                    </div>
+                    <div class="event-info">
+                        <i class="fas fa-map-marker-alt"></i> Masjid Agung Kota
+                    </div>
+                </div>
+
+                <div class="event-card aos-init">
+                    <h3 class="event-title">Resepsi</h3>
+                    <div class="event-info">
+                        <i class="far fa-calendar-alt"></i> Sabtu, 25 Desember 2024
+                    </div>
+                    <div class="event-info">
+                        <i class="far fa-clock"></i> 11:00 WIB - 13:00 WIB
+                    </div>
+                    <div class="event-info">
+                        <i class="fas fa-map-marker-alt"></i> Grand Ballroom Hotel
+                    </div>
+                </div>
+
+                <!-- COUNTDOWN -->
+                <div id="countdown" class="aos-init">
+                    <div class="time-box"><span id="days">0</span><small>Hari</small></div>
+                    <div class="time-box"><span id="hours">0</span><small>Jam</small></div>
+                    <div class="time-box"><span id="minutes">0</span><small>Menit</small></div>
+                    <div class="time-box"><span id="seconds">0</span><small>Detik</small></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PETA & LOKASI -->
+        <section style="background: white;">
+            <div class="container aos-init">
+                <h2>Lokasi Acara</h2>
+                <p style="margin-bottom: 20px;">Jl. Jendral Sudirman No. 123, Jakarta Selatan</p>
+                
+                <div class="map-container">
+                    <!-- Ganti src dengan link Google Maps Embed yang asli -->
+                    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3966.0!2d106.8!3d-6.2!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNsKwMTInMDAuMCJTIDEwNsKwNDgnMDAuMCJF!5e0!3m2!1sen!2sid!4v1600000000000!5m2!1sen!2sid" allowfullscreen="" loading="lazy"></iframe>
+                </div>
+
+                <a href="https://maps.google.com" target="_blank" class="btn">Buka Google Maps</a>
+            </div>
+        </section>
+
+        <!-- RSVP -->
+        <section id="rsvp">
+            <div class="container aos-init">
+                <h2>RSVP & Ucapan</h2>
+                <p style="margin-bottom: 20px;">Mohon konfirmasi kehadiran Anda</p>
+                
+                <form class="rsvp-form" onsubmit="alert('Terima kasih atas konfirmasi Anda!'); return false;">
+                    <input type="text" placeholder="Nama Lengkap" required>
+                    <select>
+                        <option value="Hadir">Hadir</option>
+                        <option value="Tidak Hadir">Tidak Hadir</option>
+                        <option value="Ragu-ragu">Masih Ragu</option>
+                    </select>
+                    <input type="number" placeholder="Jumlah Tamu" min="1" max="5">
+                    <textarea placeholder="Ucapan & Doa" rows="4"></textarea>
+                    <button type="submit" class="btn" style="width: 100%;">Kirim Konfirmasi</button>
+                </form>
+            </div>
+        </section>
+
+        <!-- FOOTER -->
+        <footer>
+            <div class="container">
+                <h2>Romeo & Juliet</h2>
+                <p>Merupakan suatu kehormatan dan kebahagiaan bagi kami apabila Bapak/Ibu/Saudara/i berkenan hadir untuk memberikan doa restu.</p>
+                <br>
+                <p style="font-size: 0.8rem; opacity: 0.7;">&copy; 2024 Wedding Invitation. Created with HTML.</p>
+            </div>
+        </footer>
+    </main>
 
     <script>
-        const iframe = document.querySelector('iframe');
-        const loading = document.getElementById('loading');
+        // 1. OPEN INVITATION LOGIC
+        function openInvitation() {
+            const cover = document.getElementById('cover');
+            const music = document.getElementById('bg-music');
+            
+            // Slide up cover
+            cover.classList.add('open');
+            
+            // Play music
+            music.play();
+            
+            // Trigger animations after cover is gone
+            setTimeout(() => {
+                checkScroll();
+            }, 500);
+        }
 
-        // Tampilkan loading selama 3 detik pertama
-        loading.style.display = 'block';
-        setTimeout(() => {
-            loading.style.display = 'none';
-        }, 3000);
+        // 2. MUSIC TOGGLE
+        function toggleMusic() {
+            const music = document.getElementById('bg-music');
+            const icon = document.getElementById('music-icon');
+            
+            if (music.paused) {
+                music.play();
+                icon.classList.remove('fa-play');
+                icon.classList.add('fa-music');
+                // Add pulse animation back
+                document.querySelector('.music-control').style.animation = "pulse 2s infinite";
+            } else {
+                music.pause();
+                icon.classList.remove('fa-music');
+                icon.classList.add('fa-play');
+                // Stop pulse
+                document.querySelector('.music-control').style.animation = "none";
+            }
+        }
+
+        // 3. SCROLL ANIMATION (Intersection Observer)
+        const observerOptions = {
+            threshold: 0.2
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('aos-animate');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.aos-init').forEach(el => {
+            observer.observe(el);
+        });
+
+        // Helper to trigger animation on load if opened
+        function checkScroll() {
+            document.querySelectorAll('.aos-init').forEach(el => {
+                const rect = el.getBoundingClientRect();
+                if(rect.top < window.innerHeight && rect.bottom >= 0) {
+                    el.classList.add('aos-animate');
+                }
+            });
+        }
+
+        // 4. COUNTDOWN TIMER
+        // Set tanggal acara di sini (Format: Tahun, Bulan (0-11), Hari)
+        const weddingDate = new Date(2024, 11, 25, 8, 0, 0).getTime();
+
+        const timer = setInterval(function() {
+            const now = new Date().getTime();
+            const distance = weddingDate - now;
+
+            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+            document.getElementById("days").innerText = days;
+            document.getElementById("hours").innerText = hours;
+            document.getElementById("minutes").innerText = minutes;
+            document.getElementById("seconds").innerText = seconds;
+
+            if (distance < 0) {
+                clearInterval(timer);
+                document.getElementById("countdown").innerHTML = "<h3>Acara Telah Dimulai!</h3>";
+            }
+        }, 1000);
     </script>
 </body>
 </html>
