@@ -1,4 +1,433 @@
-<!-- Designed by:  Mauricio Bucardo
-Original image: https://dribbble.com/shots/6957353-Music-Player-Widget -->
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Music Player GitHub</title>
+    <style>
+        /* --- CSS Styling --- */
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
 
-<div id="root"></div>
+        :root {
+            --primary: #6c5ce7;
+            --secondary: #a29bfe;
+            --bg: #1e1e2e;
+            --surface: #2d2d44;
+            --text: #ffffff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: var(--text);
+        }
+
+        /* Container Utama */
+        .player-container {
+            background: var(--surface);
+            width: 350px;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Efek Background Blur di belakang cover */
+        .player-container::before {
+            content: '';
+            position: absolute;
+            top: -50px;
+            left: -50px;
+            width: 150%;
+            height: 150%;
+            background: radial-gradient(circle, rgba(108, 92, 231, 0.2), transparent 70%);
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* Area Cover / Piringan Hitam */
+        .img-container {
+            width: 220px;
+            height: 220px;
+            margin: 0 auto 20px;
+            position: relative;
+            z-index: 1;
+            border-radius: 50%;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+            overflow: hidden;
+            border: 5px solid #000;
+        }
+
+        .img-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            /* Animasi Berputar */
+            animation: rotate 20s linear infinite;
+            animation-play-state: paused;
+        }
+
+        /* Kelas untuk memutar animasi */
+        .img-container.play img {
+            animation-play-state: running;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* Detail Lagu */
+        .song-details h2 {
+            font-size: 1.2rem;
+            margin-bottom: 5px;
+            color: var(--text);
+        }
+
+        .song-details h3 {
+            font-size: 0.9rem;
+            font-weight: 400;
+            color: var(--secondary);
+            margin-bottom: 25px;
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+            height: 6px;
+            width: 100%;
+            margin-bottom: 10px;
+            cursor: pointer;
+            position: relative;
+            z-index: 1;
+        }
+
+        .progress {
+            background: var(--primary);
+            border-radius: 5px;
+            height: 100%;
+            width: 0%;
+            transition: width 0.1s linear;
+        }
+
+        .duration {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.75rem;
+            color: #888;
+            margin-bottom: 20px;
+            z-index: 1;
+            position: relative;
+        }
+
+        /* Tombol Kontrol */
+        .controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            z-index: 1;
+            position: relative;
+        }
+
+        .btn {
+            background: none;
+            border: none;
+            color: var(--text);
+            cursor: pointer;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn:hover {
+            color: var(--primary);
+        }
+
+        .btn-main {
+            background: var(--primary);
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            box-shadow: 0 5px 15px rgba(108, 92, 231, 0.4);
+        }
+
+        .btn-main:hover {
+            transform: scale(1.05);
+            color: white;
+            background: var(--secondary);
+        }
+
+        /* SVG Icon sizes */
+        .btn-small svg { width: 24px; height: 24px; fill: currentColor; }
+        .btn-main svg { width: 32px; height: 32px; fill: white; }
+
+        /* Playlist Dropdown */
+        .playlist-toggle {
+            margin-top: 20px;
+            font-size: 0.8rem;
+            color: #888;
+            cursor: pointer;
+            text-decoration: underline;
+            z-index: 1;
+            position: relative;
+        }
+
+        #playlist {
+            margin-top: 15px;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+            text-align: left;
+            z-index: 1;
+            position: relative;
+        }
+
+        #playlist.open {
+            max-height: 200px;
+        }
+
+        #playlist li {
+            list-style: none;
+            padding: 10px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+        
+        #playlist li:hover {
+            color: var(--primary);
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="player-container">
+        <!-- Cover Art -->
+        <div class="img-container" id="img-container">
+            <img src="" alt="Cover Art" id="cover">
+        </div>
+
+        <!-- Info Lagu -->
+        <div class="song-details">
+            <h2 id="title">Judul Lagu</h2>
+            <h3 id="artist">Nama Artis</h3>
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="progress-container" id="progress-container">
+            <div class="progress" id="progress"></div>
+        </div>
+        <div class="duration">
+            <span id="curr-time">0:00</span>
+            <span id="dur-time">0:00</span>
+        </div>
+
+        <!-- Tombol Kontrol -->
+        <div class="controls">
+            <button class="btn btn-small" id="prev">
+                <svg viewBox="0 0 24 24"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>
+            </button>
+            <button class="btn btn-main" id="play">
+                <!-- Icon Play -->
+                <svg id="play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                <!-- Icon Pause (Hidden by default) -->
+                <svg id="pause-icon" viewBox="0 0 24 24" style="display:none;"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+            </button>
+            <button class="btn btn-small" id="next">
+                <svg viewBox="0 0 24 24"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
+            </button>
+        </div>
+
+        <!-- Playlist Trigger -->
+        <div class="playlist-toggle" onclick="togglePlaylist()">Lihat Daftar Lagu ▼</div>
+        <ul id="playlist">
+            <!-- Daftar lagu akan di-generate oleh JS -->
+        </ul>
+
+        <!-- Audio Element (Hidden) -->
+        <audio id="audio"></audio>
+    </div>
+
+    <script>
+        // --- DATA LAGU ---
+        // GANTI URL DI BAWAH INI DENGAN FILE MP3 DAN GAMBAR ANDA
+        const songs = [
+            {
+                title: "Lofi Hip Hop",
+                artist: "Lofi Girl",
+                cover: "https://picsum.photos/seed/music1/300/300",
+                src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"
+            },
+            {
+                title: "Electronic Vibe",
+                artist: "Future Bass",
+                cover: "https://picsum.photos/seed/music2/300/300",
+                src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3"
+            },
+            {
+                title: "Chill Acoustic",
+                artist: "Guitar Hero",
+                cover: "https://picsum.photos/seed/music3/300/300",
+                src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3"
+            }
+        ];
+
+        // --- SELEKSI DOM ---
+        const imgContainer = document.getElementById('img-container');
+        const cover = document.getElementById('cover');
+        const title = document.getElementById('title');
+        const artist = document.getElementById('artist');
+        const audio = document.getElementById('audio');
+        const playBtn = document.getElementById('play');
+        const playIcon = document.getElementById('play-icon');
+        const pauseIcon = document.getElementById('pause-icon');
+        const prevBtn = document.getElementById('prev');
+        const nextBtn = document.getElementById('next');
+        const progressContainer = document.getElementById('progress-container');
+        const progress = document.getElementById('progress');
+        const currTime = document.getElementById('curr-time');
+        const durTime = document.getElementById('dur-time');
+        const playlistEl = document.getElementById('playlist');
+
+        let songIndex = 0;
+
+        // --- FUNGSI UTAMA ---
+
+        // 1. Load Lagu
+        function loadSong(song) {
+            title.innerText = song.title;
+            artist.innerText = song.artist;
+            cover.src = song.cover;
+            audio.src = song.src;
+        }
+
+        // 2. Play Lagu
+        function playSong() {
+            imgContainer.classList.add('play');
+            playIcon.style.display = 'none';
+            pauseIcon.style.display = 'block';
+            audio.play();
+        }
+
+        // 3. Pause Lagu
+        function pauseSong() {
+            imgContainer.classList.remove('play');
+            playIcon.style.display = 'block';
+            pauseIcon.style.display = 'none';
+            audio.pause();
+        }
+
+        // 4. Lagu Sebelumnya
+        function prevSong() {
+            songIndex--;
+            if (songIndex < 0) {
+                songIndex = songs.length - 1;
+            }
+            loadSong(songs[songIndex]);
+            playSong();
+        }
+
+        // 5. Lagu Selanjutnya
+        function nextSong() {
+            songIndex++;
+            if (songIndex > songs.length - 1) {
+                songIndex = 0;
+            }
+            loadSong(songs[songIndex]);
+            playSong();
+        }
+
+        // 6. Update Progress Bar
+        function updateProgress(e) {
+            const { duration, currentTime } = e.srcElement;
+            if (isNaN(duration)) return;
+            
+            const progressPercent = (currentTime / duration) * 100;
+            progress.style.width = `${progressPercent}%`;
+
+            // Update waktu teks
+            // Durasi
+            const durMin = Math.floor(duration / 60);
+            let durSec = Math.floor(duration % 60);
+            if (durSec < 10) durSec = `0${durSec}`;
+            durTime.innerText = `${durMin}:${durSec}`;
+
+            // Current Time
+            const curMin = Math.floor(currentTime / 60);
+            let curSec = Math.floor(currentTime % 60);
+            if (curSec < 10) curSec = `0${curSec}`;
+            currTime.innerText = `${curMin}:${curSec}`;
+        }
+
+        // 7. Geser Progress Bar (Set Progress)
+        function setProgress(e) {
+            const width = this.clientWidth;
+            const clickX = e.offsetX;
+            const duration = audio.duration;
+            audio.currentTime = (clickX / width) * duration;
+        }
+
+        // 8. Generate Playlist
+        function renderPlaylist() {
+            playlistEl.innerHTML = '';
+            songs.forEach((song, index) => {
+                const li = document.createElement('li');
+                li.innerText = `${index + 1}. ${song.title} - ${song.artist}`;
+                li.addEventListener('click', () => {
+                    songIndex = index;
+                    loadSong(songs[songIndex]);
+                    playSong();
+                    playlistEl.classList.remove('open'); // Tutup playlist setelah klik
+                });
+                playlistEl.appendChild(li);
+            });
+        }
+
+        function togglePlaylist() {
+            playlistEl.classList.toggle('open');
+        }
+
+        // --- EVENT LISTENERS ---
+
+        playBtn.addEventListener('click', () => {
+            const isPlaying = imgContainer.classList.contains('play');
+            if (isPlaying) {
+                pauseSong();
+            } else {
+                playSong();
+            }
+        });
+
+        prevBtn.addEventListener('click', prevSong);
+        nextBtn.addEventListener('click', nextSong);
+
+        audio.addEventListener('timeupdate', updateProgress);
+        
+        // Auto next ketika lagu habis
+        audio.addEventListener('ended', nextSong);
+
+        progressContainer.addEventListener('click', setProgress);
+
+        // Initialize
+        loadSong(songs[songIndex]);
+        renderPlaylist();
+
+    </script>
+</body>
+</html>
