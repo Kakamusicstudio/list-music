@@ -2,397 +2,565 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Music Player GitHub</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kaka Music Studio</title>
     <style>
-        /* --- CSS Styling --- */
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
-
-        :root {
-            --primary: #6c5ce7;
-            --secondary: #a29bfe;
-            --bg: #1e1e2e;
-            --surface: #2d2d44;
-            --text: #ffffff;
-        }
-
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Poppins', sans-serif;
-            -webkit-tap-highlight-color: transparent; /* Hilangkan highlight biru di HP */
         }
-
+        
         body {
-            background-color: var(--bg);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0c0c1d, #1a1a2e, #16213e, #0f3460);
+            color: #e6e6e6;
+            min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
-            color: var(--text);
-            overflow: hidden; /* Mencegah scroll saat loading */
+            overflow-x: hidden;
+            position: relative;
         }
-
-        /* --- START OVERLAY (LAYAR PEMBUKA) --- */
-        #start-overlay {
-            position: fixed;
+        
+        body::before {
+            content: "";
+            position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: #000;
-            z-index: 9999;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
-            transition: opacity 0.5s ease;
+            background: 
+                radial-gradient(circle at 10% 20%, rgba(91, 44, 111, 0.4) 0%, transparent 25%),
+                radial-gradient(circle at 90% 80%, rgba(26, 188, 156, 0.3) 0%, transparent 25%),
+                radial-gradient(circle at 50% 50%, rgba(52, 152, 219, 0.2) 0%, transparent 35%);
+            z-index: -1;
         }
-
-        .pulse-btn {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            border: 2px solid var(--primary);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            animation: pulse 2s infinite;
-        }
-
-        .pulse-btn svg {
-            width: 30px;
-            height: 30px;
-            fill: var(--primary);
-            margin-left: 5px; /* Visual fix play icon centering */
-        }
-
-        .tap-text {
-            margin-top: 20px;
-            font-size: 0.9rem;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            color: #888;
-            animation: blink 1.5s infinite;
-        }
-
-        @keyframes pulse {
-            0% { box-shadow: 0 0 0 0 rgba(108, 92, 231, 0.7); transform: scale(1); }
-            70% { box-shadow: 0 0 0 20px rgba(108, 92, 231, 0); transform: scale(1.1); }
-            100% { box-shadow: 0 0 0 0 rgba(108, 92, 231, 0); transform: scale(1); }
-        }
-
-        @keyframes blink {
-            0%, 100% { opacity: 0.5; }
-            50% { opacity: 1; }
-        }
-        /* ------------------------- */
-
-        /* Container Utama */
-        .player-container {
-            background: var(--surface);
-            width: 90%;
-            max-width: 350px;
-            padding: 30px;
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        
+        .container {
             text-align: center;
+            padding: 2rem;
+            max-width: 900px;
+            width: 95%;
+        }
+        
+        .studio-name {
+            font-size: 5.5rem;
+            font-weight: 800;
+            margin: 1.5rem 0;
+            background: linear-gradient(to right, #ff8a00, #da1b60, #6a11cb, #2575fc);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+            letter-spacing: -2px;
             position: relative;
-            opacity: 0; /* Awalnya sembunyi */
-            transform: scale(0.9);
-            transition: all 0.5s ease;
+            animation: pulse 3s infinite;
         }
-
-        .player-container.show {
-            opacity: 1;
-            transform: scale(1);
+        
+        .studio-name::after {
+            content: "MUSIC STUDIO";
+            position: absolute;
+            bottom: -25px;
+            left: 0;
+            width: 100%;
+            font-size: 1.8rem;
+            letter-spacing: 8px;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.85);
+            font-weight: 300;
         }
-
-        .img-container {
+        
+        .welcome-text {
+            font-size: 1.8rem;
+            margin: 2.5rem 0 1.5rem;
+            color: #f8f9fa;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.7);
+            line-height: 1.5;
+        }
+        
+        .robot-container {
+            margin: 2.5rem auto;
+            position: relative;
             width: 220px;
             height: 220px;
-            margin: 0 auto 20px;
-            position: relative;
+        }
+        
+        .robot-head {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 160px;
+            height: 160px;
+            background: linear-gradient(145deg, #3a3a5a, #2a2a4a);
+            border-radius: 24px;
+            border: 8px solid #4a4a7a;
+            box-shadow: 
+                0 0 25px rgba(74, 74, 122, 0.8),
+                inset 0 0 20px rgba(106, 17, 203, 0.5);
+            z-index: 10;
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        .antenna {
+            position: absolute;
+            top: -35px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 8px;
+            height: 40px;
+            background: linear-gradient(to top, #4a4a7a, #6a11cb);
+            border-radius: 4px;
+            z-index: 5;
+        }
+        
+        .antenna-top {
+            position: absolute;
+            top: -50px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 20px;
+            height: 20px;
+            background: #ff3d7f;
             border-radius: 50%;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+            box-shadow: 0 0 15px #ff3d7f;
+            animation: pulse-slow 2s infinite;
+        }
+        
+        .eye {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            background: #00ffcc;
+            border-radius: 50%;
+            box-shadow: 0 0 15px #00ffcc;
+            top: 60px;
+            z-index: 15;
+        }
+        
+        .eye.left {
+            left: 35px;
+        }
+        
+        .eye.right {
+            right: 35px;
+        }
+        
+        .mouth {
+            position: absolute;
+            bottom: 35px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 70px;
+            height: 25px;
+            background: linear-gradient(to bottom, #ff3d7f, #cc0052);
+            border-radius: 0 0 15px 15px;
+            box-shadow: 0 0 15px rgba(255, 61, 127, 0.8);
             overflow: hidden;
-            border: 5px solid #000;
         }
-
-        .img-container img {
+        
+        .mouth::before {
+            content: "";
+            position: absolute;
+            top: -5px;
+            left: 0;
             width: 100%;
-            height: 100%;
-            object-fit: cover;
-            animation: rotate 20s linear infinite;
-            animation-play-state: paused;
+            height: 5px;
+            background: rgba(255, 255, 255, 0.3);
         }
-
-        .img-container.play img {
-            animation-play-state: running;
-        }
-
-        @keyframes rotate {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
-
-        .song-details h2 {
-            font-size: 1.2rem;
-            margin-bottom: 5px;
-            color: var(--text);
-        }
-
-        .song-details h3 {
-            font-size: 0.9rem;
-            font-weight: 400;
-            color: var(--secondary);
-            margin-bottom: 25px;
-        }
-
-        .progress-container {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 5px;
-            height: 6px;
+        
+        .mouth::after {
+            content: "";
+            position: absolute;
+            bottom: -5px;
+            left: 0;
             width: 100%;
-            margin-bottom: 10px;
-            cursor: pointer;
+            height: 5px;
+            background: rgba(255, 255, 255, 0.3);
         }
-
-        .progress {
-            background: var(--primary);
-            border-radius: 5px;
-            height: 100%;
-            width: 0%;
-            transition: width 0.1s linear;
+        
+        .audio-container {
+            background: rgba(30, 30, 50, 0.85);
+            border-radius: 20px;
+            padding: 2rem;
+            margin: 2.5rem auto;
+            max-width: 600px;
+            box-shadow: 
+                0 10px 30px rgba(0, 0, 0, 0.7),
+                0 0 25px rgba(106, 17, 203, 0.4);
+            border: 1px solid rgba(106, 17, 203, 0.5);
+            position: relative;
+            overflow: hidden;
         }
-
-        .duration {
+        
+        .audio-container::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(to right, #ff8a00, #da1b60, #6a11cb, #2575fc);
+        }
+        
+        .player-title {
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+            color: #fff;
             display: flex;
-            justify-content: space-between;
-            font-size: 0.75rem;
-            color: #888;
-            margin-bottom: 20px;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
         }
-
+        
+        .player-title i {
+            font-size: 2rem;
+        }
+        
+        .audio-player {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.5rem;
+        }
+        
+        .waveform {
+            width: 100%;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            margin-bottom: 10px;
+        }
+        
+        .bar {
+            width: 6px;
+            height: 100%;
+            background: linear-gradient(to top, #00c9ff, #92fe9d);
+            border-radius: 3px;
+            animation: wave 1.5s ease-in-out infinite;
+            transform-origin: bottom;
+        }
+        
+        .bar:nth-child(1) { animation-delay: -0.75s; height: 20%; }
+        .bar:nth-child(2) { animation-delay: -0.6s; height: 40%; }
+        .bar:nth-child(3) { animation-delay: -0.45s; height: 60%; }
+        .bar:nth-child(4) { animation-delay: -0.3s; height: 75%; }
+        .bar:nth-child(5) { animation-delay: -0.15s; height: 90%; }
+        .bar:nth-child(6) { animation-delay: 0s; height: 100%; }
+        .bar:nth-child(7) { animation-delay: -0.15s; height: 90%; }
+        .bar:nth-child(8) { animation-delay: -0.3s; height: 75%; }
+        .bar:nth-child(9) { animation-delay: -0.45s; height: 60%; }
+        .bar:nth-child(10) { animation-delay: -0.6s; height: 40%; }
+        .bar:nth-child(11) { animation-delay: -0.75s; height: 20%; }
+        
         .controls {
             display: flex;
-            justify-content: center;
             align-items: center;
-            gap: 20px;
+            gap: 25px;
         }
-
-        .btn {
-            background: none;
+        
+        .play-btn {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #ff3d7f, #cc0052);
             border: none;
-            color: var(--text);
+            color: white;
+            font-size: 2rem;
             cursor: pointer;
-            transition: 0.2s;
+            box-shadow: 
+                0 5px 15px rgba(204, 0, 82, 0.6),
+                0 0 20px rgba(255, 61, 127, 0.5);
+            transition: all 0.3s ease;
             display: flex;
             align-items: center;
             justify-content: center;
         }
-
-        .btn:hover { color: var(--primary); }
-
-        .btn-main {
-            background: var(--primary);
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            box-shadow: 0 5px 15px rgba(108, 92, 231, 0.4);
-        }
-
-        .btn-main:hover {
+        
+        .play-btn:hover {
             transform: scale(1.05);
-            color: white;
-            background: var(--secondary);
+            box-shadow: 
+                0 7px 20px rgba(204, 0, 82, 0.8),
+                0 0 25px rgba(255, 61, 127, 0.7);
         }
-
-        .btn-small svg { width: 24px; height: 24px; fill: currentColor; }
-        .btn-main svg { width: 32px; height: 32px; fill: white; }
+        
+        .play-btn:active {
+            transform: scale(0.95);
+        }
+        
+        .play-btn i {
+            margin-left: 3px;
+        }
+        
+        .upload-note {
+            background: rgba(40, 40, 70, 0.9);
+            border-left: 4px solid #6a11cb;
+            padding: 1.2rem;
+            margin-top: 2rem;
+            border-radius: 0 8px 8px 0;
+            text-align: left;
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+        
+        .upload-note strong {
+            color: #6a11cb;
+        }
+        
+        .upload-note code {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+        
+        .github-badge {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #6a11cb, #2575fc);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: transform 0.3s ease;
+        }
+        
+        .github-badge:hover {
+            transform: translateY(-2px);
+        }
+        
+        .github-badge i {
+            font-size: 1.4rem;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateX(-50%) translateY(0); }
+            50% { transform: translateX(-50%) translateY(-10px); }
+        }
+        
+        @keyframes pulse {
+            0% { text-shadow: 0 0 10px rgba(255, 138, 0, 0.7), 0 0 20px rgba(218, 27, 96, 0.7), 0 0 30px rgba(106, 17, 203, 0.7), 0 0 40px rgba(37, 117, 252, 0.7); }
+            50% { text-shadow: 0 0 15px rgba(255, 138, 0, 0.9), 0 0 25px rgba(218, 27, 96, 0.9), 0 0 35px rgba(106, 17, 203, 0.9), 0 0 45px rgba(37, 117, 252, 0.9); }
+            100% { text-shadow: 0 0 10px rgba(255, 138, 0, 0.7), 0 0 20px rgba(218, 27, 96, 0.7), 0 0 30px rgba(106, 17, 203, 0.7), 0 0 40px rgba(37, 117, 252, 0.7); }
+        }
+        
+        @keyframes pulse-slow {
+            0%, 100% { box-shadow: 0 0 10px #ff3d7f, 0 0 20px #ff3d7f; }
+            50% { box-shadow: 0 0 15px #ff3d7f, 0 0 25px #ff3d7f, 0 0 30px #ff3d7f; }
+        }
+        
+        @keyframes wave {
+            0%, 100% { transform: scaleY(1); }
+            50% { transform: scaleY(0.5); }
+        }
+        
+        @media (max-width: 768px) {
+            .studio-name {
+                font-size: 4rem;
+            }
+            
+            .studio-name::after {
+                font-size: 1.4rem;
+                bottom: -20px;
+                letter-spacing: 4px;
+            }
+            
+            .welcome-text {
+                font-size: 1.5rem;
+            }
+            
+            .robot-container {
+                width: 180px;
+                height: 180px;
+            }
+            
+            .robot-head {
+                width: 130px;
+                height: 130px;
+            }
+            
+            .audio-container {
+                padding: 1.5rem;
+            }
+            
+            .player-title {
+                font-size: 1.5rem;
+            }
+            
+            .play-btn {
+                width: 60px;
+                height: 60px;
+                font-size: 1.7rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .studio-name {
+                font-size: 3.2rem;
+            }
+            
+            .studio-name::after {
+                font-size: 1.2rem;
+                bottom: -18px;
+                letter-spacing: 3px;
+            }
+            
+            .welcome-text {
+                font-size: 1.3rem;
+            }
+            
+            .robot-container {
+                width: 150px;
+                height: 150px;
+            }
+            
+            .robot-head {
+                width: 110px;
+                height: 110px;
+            }
+            
+            .controls {
+                gap: 15px;
+            }
+            
+            .play-btn {
+                width: 50px;
+                height: 50px;
+                font-size: 1.4rem;
+            }
+            
+            .waveform {
+                height: 40px;
+            }
+            
+            .bar {
+                width: 4px;
+            }
+        }
     </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-
-    <!-- OVERLAY TAP TO START -->
-    <div id="start-overlay" onclick="initPlayer()">
-        <div class="pulse-btn">
-            <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-        </div>
-        <div class="tap-text">Tap to Play Music</div>
-    </div>
-
-    <div class="player-container" id="player-box">
-        <div class="img-container" id="img-container">
-            <img src="" alt="Cover" id="cover">
-        </div>
-
-        <div class="song-details">
-            <h2 id="title">Loading...</h2>
-            <h3 id="artist">Please Wait</h3>
-        </div>
-
-        <div class="progress-container" id="progress-container">
-            <div class="progress" id="progress"></div>
+    <a href="https://github.com/kaka" class="github-badge" target="_blank">
+        <i class="fab fa-github"></i> github.com/kaka
+    </a>
+    
+    <div class="container">
+        <h1 class="studio-name">KAKA</h1>
+        <p class="welcome-text">Selamat datang di Kaka Music Studio</p>
+        
+        <div class="robot-container">
+            <div class="antenna"></div>
+            <div class="antenna-top"></div>
+            <div class="robot-head">
+                <div class="eye left"></div>
+                <div class="eye right"></div>
+                <div class="mouth"></div>
+            </div>
         </div>
         
-        <div class="duration">
-            <span id="curr-time">0:00</span>
-            <span id="dur-time">0:00</span>
+        <div class="audio-container">
+            <div class="player-title">
+                <i class="fas fa-robot"></i> Robot Voice Message
+            </div>
+            <div class="audio-player">
+                <div class="waveform">
+                    <div class="bar"></div>
+                    <div class="bar"></div>
+                    <div class="bar"></div>
+                    <div class="bar"></div>
+                    <div class="bar"></div>
+                    <div class="bar"></div>
+                    <div class="bar"></div>
+                    <div class="bar"></div>
+                    <div class="bar"></div>
+                    <div class="bar"></div>
+                    <div class="bar"></div>
+                </div>
+                <button class="play-btn" id="playButton">
+                    <i class="fas fa-play"></i>
+                </button>
+                <audio id="robotAudio">
+                    <source src="welcome-robot.mp3" type="audio/mpeg">
+                    Your browser does not support the audio element.
+                </audio>
+            </div>
         </div>
-
-        <div class="controls">
-            <button class="btn btn-small" id="prev">
-                <svg viewBox="0 0 24 24"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>
-            </button>
-            <button class="btn btn-main" id="play">
-                <svg id="play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-                <svg id="pause-icon" viewBox="0 0 24 24" style="display:none;"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
-            </button>
-            <button class="btn btn-small" id="next">
-                <svg viewBox="0 0 24 24"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
-            </button>
+        
+        <div class="upload-note">
+            <p><strong>Catatan untuk Kaka:</strong> Untuk mengunggah file audio robot Anda ke GitHub:</p>
+            <ol>
+                <li>Rekam suara robot yang mengatakan "Selamat datang di Kaka Music Studio"</li>
+                <li>Simpan sebagai <code>welcome-robot.mp3</code> di folder repository Anda</li>
+                <li>Upload file tersebut ke GitHub bersama dengan file HTML ini</li>
+                <li>Tombol play di atas akan memainkan suara robot Anda!</li>
+            </ol>
         </div>
-
-        <audio id="audio" preload="auto"></audio>
     </div>
 
     <script>
-        // --- DATA LAGU ---
-        const songs = [
-            {
-                title: "Lofi Hip Hop",
-                artist: "Lofi Girl",
-                cover: "https://picsum.photos/seed/music1/300/300",
-                src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"
-            },
-            {
-                title: "Electronic Vibe",
-                artist: "Future Bass",
-                cover: "https://picsum.photos/seed/music2/300/300",
-                src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3"
-            }
-        ];
-
-        // --- DOM ---
-        const overlay = document.getElementById('start-overlay');
-        const playerBox = document.getElementById('player-box');
-        const imgContainer = document.getElementById('img-container');
-        const cover = document.getElementById('cover');
-        const title = document.getElementById('title');
-        const artist = document.getElementById('artist');
-        const audio = document.getElementById('audio');
-        const playBtn = document.getElementById('play');
-        const playIcon = document.getElementById('play-icon');
-        const pauseIcon = document.getElementById('pause-icon');
-        const prevBtn = document.getElementById('prev');
-        const nextBtn = document.getElementById('next');
-        const progressContainer = document.getElementById('progress-container');
-        const progress = document.getElementById('progress');
-        const currTime = document.getElementById('curr-time');
-        const durTime = document.getElementById('dur-time');
-
-        let songIndex = 0;
-
-        // 1. Fungsi Inisialisasi (Dipanggil saat overlay diklik)
-        function initPlayer() {
-            // Hilangkan overlay dengan animasi
-            overlay.style.opacity = '0';
-            setTimeout(() => {
-                overlay.style.display = 'none';
-                // Tampilkan player
-                playerBox.classList.add('show');
-                // Langsung Putar Lagu
-                playSong();
-            }, 500);
-        }
-
-        // 2. Load Lagu
-        function loadSong(song) {
-            title.innerText = song.title;
-            artist.innerText = song.artist;
-            cover.src = song.cover;
-            audio.src = song.src;
-        }
-
-        // 3. Play
-        function playSong() {
-            imgContainer.classList.add('play');
-            playIcon.style.display = 'none';
-            pauseIcon.style.display = 'block';
-            audio.play();
-        }
-
-        // 4. Pause
-        function pauseSong() {
-            imgContainer.classList.remove('play');
-            playIcon.style.display = 'block';
-            pauseIcon.style.display = 'none';
-            audio.pause();
-        }
-
-        // 5. Prev / Next Logic
-        function prevSong() {
-            songIndex--;
-            if (songIndex < 0) songIndex = songs.length - 1;
-            loadSong(songs[songIndex]);
-            playSong();
-        }
-
-        function nextSong() {
-            songIndex++;
-            if (songIndex > songs.length - 1) songIndex = 0;
-            loadSong(songs[songIndex]);
-            playSong();
-        }
-
-        // 6. Progress Update
-        function updateProgress(e) {
-            const { duration, currentTime } = e.srcElement;
-            if (isNaN(duration)) return;
+        document.addEventListener('DOMContentLoaded', function() {
+            const playButton = document.getElementById('playButton');
+            const audio = document.getElementById('robotAudio');
+            const waveform = document.querySelector('.waveform');
+            const bars = document.querySelectorAll('.bar');
             
-            const progressPercent = (currentTime / duration) * 100;
-            progress.style.width = `${progressPercent}%`;
-
-            // Durasi text
-            const durMin = Math.floor(duration / 60);
-            let durSec = Math.floor(duration % 60);
-            if (durSec < 10) durSec = `0${durSec}`;
-            durTime.innerText = `${durMin}:${durSec}`;
-
-            // Current text
-            const curMin = Math.floor(currentTime / 60);
-            let curSec = Math.floor(currentTime % 60);
-            if (curSec < 10) curSec = `0${curSec}`;
-            currTime.innerText = `${curMin}:${curSec}`;
-        }
-
-        function setProgress(e) {
-            const width = this.clientWidth;
-            const clickX = e.offsetX;
-            const duration = audio.duration;
-            audio.currentTime = (clickX / width) * duration;
-        }
-
-        // Event Listeners
-        playBtn.addEventListener('click', () => {
-            const isPlaying = imgContainer.classList.contains('play');
-            isPlaying ? pauseSong() : playSong();
+            // Toggle play/pause
+            playButton.addEventListener('click', function() {
+                if (audio.paused) {
+                    audio.play();
+                    playButton.innerHTML = '<i class="fas fa-pause"></i>';
+                    waveform.style.animationPlayState = 'running';
+                    bars.forEach(bar => {
+                        bar.style.animationPlayState = 'running';
+                    });
+                } else {
+                    audio.pause();
+                    playButton.innerHTML = '<i class="fas fa-play"></i>';
+                    waveform.style.animationPlayState = 'paused';
+                    bars.forEach(bar => {
+                        bar.style.animationPlayState = 'paused';
+                    });
+                }
+            });
+            
+            // Reset button when audio ends
+            audio.addEventListener('ended', function() {
+                playButton.innerHTML = '<i class="fas fa-play"></i>';
+                waveform.style.animationPlayState = 'paused';
+                bars.forEach(bar => {
+                    bar.style.animationPlayState = 'paused';
+                });
+            });
+            
+            // Add animation to waveform on page load
+            setTimeout(() => {
+                waveform.style.animation = 'none';
+                setTimeout(() => {
+                    waveform.style.animation = 'pulse 3s infinite';
+                }, 10);
+            }, 1000);
+            
+            // Add interactive effect to robot eyes
+            const eyes = document.querySelectorAll('.eye');
+            document.addEventListener('mousemove', (e) => {
+                const xAxis = (window.innerWidth / 2 - e.pageX) / 25;
+                const yAxis = (window.innerHeight / 2 - e.pageY) / 25;
+                eyes.forEach(eye => {
+                    eye.style.transform = `translate(${xAxis}px, ${yAxis}px)`;
+                });
+            });
         });
-
-        prevBtn.addEventListener('click', prevSong);
-        nextBtn.addEventListener('click', nextSong);
-
-        audio.addEventListener('timeupdate', updateProgress);
-        audio.addEventListener('ended', nextSong);
-
-        progressContainer.addEventListener('click', setProgress);
-
-        // Load pertama kali
-        loadSong(songs[songIndex]);
-
     </script>
 </body>
 </html>
