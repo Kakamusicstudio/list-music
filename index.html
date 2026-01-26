@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Kaka Music Studio</title>
     <style>
         * {
@@ -13,77 +13,66 @@
         
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #0c0c1d, #1a1a2e, #16213e, #0f3460);
-            color: #e6e6e6;
-            min-height: 100vh;
+            background: linear-gradient(135deg, #0a0a1a 0%, #1a1a3a 50%, #0d0d2b 100%);
+            color: white;
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
             display: flex;
             justify-content: center;
             align-items: center;
-            overflow-x: hidden;
             position: relative;
-        }
-        
-        body::before {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: 
-                radial-gradient(circle at 10% 20%, rgba(91, 44, 111, 0.4) 0%, transparent 25%),
-                radial-gradient(circle at 90% 80%, rgba(26, 188, 156, 0.3) 0%, transparent 25%),
-                radial-gradient(circle at 50% 50%, rgba(52, 152, 219, 0.2) 0%, transparent 35%);
-            z-index: -1;
+            touch-action: manipulation;
         }
         
         .container {
             text-align: center;
-            padding: 2rem;
-            max-width: 900px;
-            width: 95%;
+            padding: 20px;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            z-index: 10;
         }
         
         .studio-name {
-            font-size: 5.5rem;
+            font-size: 2.8rem;
             font-weight: 800;
-            margin: 1.5rem 0;
+            margin: 25px 0 15px;
             background: linear-gradient(to right, #ff8a00, #da1b60, #6a11cb, #2575fc);
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
-            text-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
-            letter-spacing: -2px;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+            letter-spacing: -0.5px;
+            line-height: 1.1;
+            text-transform: uppercase;
             position: relative;
-            animation: pulse 3s infinite;
         }
         
         .studio-name::after {
             content: "MUSIC STUDIO";
             position: absolute;
-            bottom: -25px;
+            bottom: -28px;
             left: 0;
             width: 100%;
-            font-size: 1.8rem;
-            letter-spacing: 8px;
-            text-transform: uppercase;
+            font-size: 1.1rem;
+            letter-spacing: 3px;
             color: rgba(255, 255, 255, 0.85);
             font-weight: 300;
-        }
-        
-        .welcome-text {
-            font-size: 1.8rem;
-            margin: 2.5rem 0 1.5rem;
-            color: #f8f9fa;
-            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.7);
-            line-height: 1.5;
+            text-transform: uppercase;
         }
         
         .robot-container {
-            margin: 2.5rem auto;
+            width: 200px;
+            height: 200px;
             position: relative;
-            width: 220px;
-            height: 220px;
+            margin: 20px auto;
+            transform-origin: center bottom;
+            animation: bounce 3s ease-in-out infinite;
         }
         
         .robot-head {
@@ -93,23 +82,22 @@
             transform: translateX(-50%);
             width: 160px;
             height: 160px;
-            background: linear-gradient(145deg, #3a3a5a, #2a2a4a);
+            background: linear-gradient(145deg, #2a2a4a, #1a1a3a);
             border-radius: 24px;
-            border: 8px solid #4a4a7a;
+            border: 6px solid #4a4a7a;
             box-shadow: 
                 0 0 25px rgba(74, 74, 122, 0.8),
                 inset 0 0 20px rgba(106, 17, 203, 0.5);
             z-index: 10;
-            animation: float 3s ease-in-out infinite;
         }
         
         .antenna {
             position: absolute;
-            top: -35px;
+            top: -25px;
             left: 50%;
             transform: translateX(-50%);
-            width: 8px;
-            height: 40px;
+            width: 6px;
+            height: 30px;
             background: linear-gradient(to top, #4a4a7a, #6a11cb);
             border-radius: 4px;
             z-index: 5;
@@ -117,11 +105,11 @@
         
         .antenna-top {
             position: absolute;
-            top: -50px;
+            top: -40px;
             left: 50%;
             transform: translateX(-50%);
-            width: 20px;
-            height: 20px;
+            width: 16px;
+            height: 16px;
             background: #ff3d7f;
             border-radius: 50%;
             box-shadow: 0 0 15px #ff3d7f;
@@ -130,228 +118,124 @@
         
         .eye {
             position: absolute;
-            width: 40px;
-            height: 40px;
+            width: 35px;
+            height: 35px;
             background: #00ffcc;
             border-radius: 50%;
             box-shadow: 0 0 15px #00ffcc;
-            top: 60px;
+            top: 55px;
             z-index: 15;
         }
         
         .eye.left {
-            left: 35px;
+            left: 30px;
         }
         
         .eye.right {
-            right: 35px;
+            right: 30px;
+        }
+        
+        .eye::after {
+            content: "";
+            position: absolute;
+            width: 15px;
+            height: 15px;
+            background: #000;
+            border-radius: 50%;
+            top: 8px;
+            left: 8px;
         }
         
         .mouth {
             position: absolute;
-            bottom: 35px;
+            bottom: 30px;
             left: 50%;
             transform: translateX(-50%);
-            width: 70px;
-            height: 25px;
+            width: 65px;
+            height: 20px;
             background: linear-gradient(to bottom, #ff3d7f, #cc0052);
-            border-radius: 0 0 15px 15px;
+            border-radius: 0 0 12px 12px;
             box-shadow: 0 0 15px rgba(255, 61, 127, 0.8);
             overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            padding-bottom: 3px;
         }
         
         .mouth::before {
             content: "";
             position: absolute;
-            top: -5px;
-            left: 0;
-            width: 100%;
-            height: 5px;
-            background: rgba(255, 255, 255, 0.3);
+            bottom: 3px;
+            width: 90%;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 2px;
         }
         
-        .mouth::after {
-            content: "";
+        .audio-status {
             position: absolute;
-            bottom: -5px;
-            left: 0;
-            width: 100%;
-            height: 5px;
-            background: rgba(255, 255, 255, 0.3);
-        }
-        
-        .audio-container {
+            bottom: 30px;
             background: rgba(30, 30, 50, 0.85);
-            border-radius: 20px;
-            padding: 2rem;
-            margin: 2.5rem auto;
-            max-width: 600px;
-            box-shadow: 
-                0 10px 30px rgba(0, 0, 0, 0.7),
-                0 0 25px rgba(106, 17, 203, 0.4);
+            border-radius: 30px;
+            padding: 8px 20px;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
             border: 1px solid rgba(106, 17, 203, 0.5);
-            position: relative;
-            overflow: hidden;
+            animation: fadeIn 2s ease-out;
         }
         
-        .audio-container::before {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 5px;
-            background: linear-gradient(to right, #ff8a00, #da1b60, #6a11cb, #2575fc);
-        }
-        
-        .player-title {
-            font-size: 1.8rem;
-            margin-bottom: 1.5rem;
-            color: #fff;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
-        
-        .player-title i {
-            font-size: 2rem;
-        }
-        
-        .audio-player {
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 1.5rem;
-        }
-        
-        .waveform {
-            width: 100%;
-            height: 60px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 4px;
-            margin-bottom: 10px;
-        }
-        
-        .bar {
-            width: 6px;
-            height: 100%;
-            background: linear-gradient(to top, #00c9ff, #92fe9d);
-            border-radius: 3px;
-            animation: wave 1.5s ease-in-out infinite;
-            transform-origin: bottom;
-        }
-        
-        .bar:nth-child(1) { animation-delay: -0.75s; height: 20%; }
-        .bar:nth-child(2) { animation-delay: -0.6s; height: 40%; }
-        .bar:nth-child(3) { animation-delay: -0.45s; height: 60%; }
-        .bar:nth-child(4) { animation-delay: -0.3s; height: 75%; }
-        .bar:nth-child(5) { animation-delay: -0.15s; height: 90%; }
-        .bar:nth-child(6) { animation-delay: 0s; height: 100%; }
-        .bar:nth-child(7) { animation-delay: -0.15s; height: 90%; }
-        .bar:nth-child(8) { animation-delay: -0.3s; height: 75%; }
-        .bar:nth-child(9) { animation-delay: -0.45s; height: 60%; }
-        .bar:nth-child(10) { animation-delay: -0.6s; height: 40%; }
-        .bar:nth-child(11) { animation-delay: -0.75s; height: 20%; }
-        
-        .controls {
-            display: flex;
-            align-items: center;
-            gap: 25px;
-        }
-        
-        .play-btn {
-            width: 70px;
-            height: 70px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #ff3d7f, #cc0052);
-            border: none;
-            color: white;
-            font-size: 2rem;
-            cursor: pointer;
-            box-shadow: 
-                0 5px 15px rgba(204, 0, 82, 0.6),
-                0 0 20px rgba(255, 61, 127, 0.5);
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .play-btn:hover {
-            transform: scale(1.05);
-            box-shadow: 
-                0 7px 20px rgba(204, 0, 82, 0.8),
-                0 0 25px rgba(255, 61, 127, 0.7);
-        }
-        
-        .play-btn:active {
-            transform: scale(0.95);
-        }
-        
-        .play-btn i {
-            margin-left: 3px;
-        }
-        
-        .upload-note {
-            background: rgba(40, 40, 70, 0.9);
-            border-left: 4px solid #6a11cb;
-            padding: 1.2rem;
-            margin-top: 2rem;
-            border-radius: 0 8px 8px 0;
-            text-align: left;
-            font-size: 0.95rem;
-            line-height: 1.6;
-        }
-        
-        .upload-note strong {
-            color: #6a11cb;
-        }
-        
-        .upload-note code {
-            background: rgba(0, 0, 0, 0.3);
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-family: monospace;
+        .audio-status i {
+            color: #00ffcc;
+            font-size: 1.1rem;
         }
         
         .github-badge {
             position: absolute;
-            top: 20px;
-            right: 20px;
-            background: linear-gradient(135deg, #6a11cb, #2575fc);
+            top: 15px;
+            right: 15px;
+            background: rgba(106, 17, 203, 0.25);
             color: white;
-            padding: 8px 16px;
+            padding: 6px 14px;
             border-radius: 30px;
             text-decoration: none;
             font-weight: bold;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            font-size: 0.85rem;
             display: flex;
             align-items: center;
-            gap: 8px;
-            transition: transform 0.3s ease;
-        }
-        
-        .github-badge:hover {
-            transform: translateY(-2px);
+            gap: 6px;
+            border: 1px solid rgba(106, 17, 203, 0.5);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            z-index: 20;
         }
         
         .github-badge i {
-            font-size: 1.4rem;
+            font-size: 1.1rem;
         }
         
-        @keyframes float {
-            0%, 100% { transform: translateX(-50%) translateY(0); }
-            50% { transform: translateX(-50%) translateY(-10px); }
+        .particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
         }
         
-        @keyframes pulse {
-            0% { text-shadow: 0 0 10px rgba(255, 138, 0, 0.7), 0 0 20px rgba(218, 27, 96, 0.7), 0 0 30px rgba(106, 17, 203, 0.7), 0 0 40px rgba(37, 117, 252, 0.7); }
-            50% { text-shadow: 0 0 15px rgba(255, 138, 0, 0.9), 0 0 25px rgba(218, 27, 96, 0.9), 0 0 35px rgba(106, 17, 203, 0.9), 0 0 45px rgba(37, 117, 252, 0.9); }
-            100% { text-shadow: 0 0 10px rgba(255, 138, 0, 0.7), 0 0 20px rgba(218, 27, 96, 0.7), 0 0 30px rgba(106, 17, 203, 0.7), 0 0 40px rgba(37, 117, 252, 0.7); }
+        .particle {
+            position: absolute;
+            background: rgba(106, 17, 203, 0.7);
+            border-radius: 50%;
+            animation: float 15s infinite linear;
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-15px) scale(1.05); }
         }
         
         @keyframes pulse-slow {
@@ -359,92 +243,99 @@
             50% { box-shadow: 0 0 15px #ff3d7f, 0 0 25px #ff3d7f, 0 0 30px #ff3d7f; }
         }
         
-        @keyframes wave {
-            0%, 100% { transform: scaleY(1); }
-            50% { transform: scaleY(0.5); }
-        }
-        
-        @media (max-width: 768px) {
-            .studio-name {
-                font-size: 4rem;
+        @keyframes float {
+            0% {
+                transform: translateY(0) translateX(0) rotate(0deg);
+                opacity: 1;
             }
-            
-            .studio-name::after {
-                font-size: 1.4rem;
-                bottom: -20px;
-                letter-spacing: 4px;
-            }
-            
-            .welcome-text {
-                font-size: 1.5rem;
-            }
-            
-            .robot-container {
-                width: 180px;
-                height: 180px;
-            }
-            
-            .robot-head {
-                width: 130px;
-                height: 130px;
-            }
-            
-            .audio-container {
-                padding: 1.5rem;
-            }
-            
-            .player-title {
-                font-size: 1.5rem;
-            }
-            
-            .play-btn {
-                width: 60px;
-                height: 60px;
-                font-size: 1.7rem;
+            100% {
+                transform: translateY(-100vh) translateX(50px) rotate(360deg);
+                opacity: 0;
             }
         }
         
-        @media (max-width: 480px) {
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @media (max-width: 375px) {
             .studio-name {
-                font-size: 3.2rem;
+                font-size: 2.5rem;
             }
             
             .studio-name::after {
-                font-size: 1.2rem;
-                bottom: -18px;
-                letter-spacing: 3px;
-            }
-            
-            .welcome-text {
-                font-size: 1.3rem;
+                font-size: 0.95rem;
+                bottom: -25px;
+                letter-spacing: 2px;
             }
             
             .robot-container {
-                width: 150px;
-                height: 150px;
+                width: 170px;
+                height: 170px;
             }
             
             .robot-head {
-                width: 110px;
-                height: 110px;
+                width: 135px;
+                height: 135px;
             }
             
-            .controls {
-                gap: 15px;
+            .eye {
+                width: 30px;
+                height: 30px;
             }
             
-            .play-btn {
-                width: 50px;
-                height: 50px;
-                font-size: 1.4rem;
+            .mouth {
+                width: 55px;
+                height: 18px;
+            }
+        }
+        
+        @media (min-width: 768px) {
+            .studio-name {
+                font-size: 4.5rem;
             }
             
-            .waveform {
+            .studio-name::after {
+                font-size: 1.8rem;
+                bottom: -35px;
+                letter-spacing: 5px;
+            }
+            
+            .robot-container {
+                width: 280px;
+                height: 280px;
+            }
+            
+            .robot-head {
+                width: 220px;
+                height: 220px;
+            }
+            
+            .antenna {
                 height: 40px;
+                top: -35px;
             }
             
-            .bar {
-                width: 4px;
+            .antenna-top {
+                width: 22px;
+                height: 22px;
+                top: -55px;
+            }
+            
+            .eye {
+                width: 45px;
+                height: 45px;
+                top: 75px;
+            }
+            
+            .eye.left { left: 40px; }
+            .eye.right { right: 40px; }
+            
+            .mouth {
+                width: 90px;
+                height: 28px;
+                bottom: 40px;
             }
         }
     </style>
@@ -452,12 +343,11 @@
 </head>
 <body>
     <a href="https://github.com/kaka" class="github-badge" target="_blank">
-        <i class="fab fa-github"></i> github.com/kaka
+        <i class="fab fa-github"></i> kaka
     </a>
     
     <div class="container">
         <h1 class="studio-name">KAKA</h1>
-        <p class="welcome-text">Selamat datang di Kaka Music Studio</p>
         
         <div class="robot-container">
             <div class="antenna"></div>
@@ -469,90 +359,97 @@
             </div>
         </div>
         
-        <div class="audio-container">
-            <div class="player-title">
-                <i class="fas fa-robot"></i> Robot Voice Message
-            </div>
-            <div class="audio-player">
-                <div class="waveform">
-                    <div class="bar"></div>
-                    <div class="bar"></div>
-                    <div class="bar"></div>
-                    <div class="bar"></div>
-                    <div class="bar"></div>
-                    <div class="bar"></div>
-                    <div class="bar"></div>
-                    <div class="bar"></div>
-                    <div class="bar"></div>
-                    <div class="bar"></div>
-                    <div class="bar"></div>
-                </div>
-                <button class="play-btn" id="playButton">
-                    <i class="fas fa-play"></i>
-                </button>
-                <audio id="robotAudio">
-                    <source src="welcome-robot.mp3" type="audio/mpeg">
-                    Your browser does not support the audio element.
-                </audio>
-            </div>
-        </div>
-        
-        <div class="upload-note">
-            <p><strong>Catatan untuk Kaka:</strong> Untuk mengunggah file audio robot Anda ke GitHub:</p>
-            <ol>
-                <li>Rekam suara robot yang mengatakan "Selamat datang di Kaka Music Studio"</li>
-                <li>Simpan sebagai <code>welcome-robot.mp3</code> di folder repository Anda</li>
-                <li>Upload file tersebut ke GitHub bersama dengan file HTML ini</li>
-                <li>Tombol play di atas akan memainkan suara robot Anda!</li>
-            </ol>
+        <div class="audio-status">
+            <i class="fas fa-volume-up"></i>
+            <span>Robot voice playing...</span>
         </div>
     </div>
+    
+    <div class="particles" id="particles"></div>
+    
+    <audio id="robotAudio" autoplay loop>
+        <source src="welcome-robot.mp3" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const playButton = document.getElementById('playButton');
-            const audio = document.getElementById('robotAudio');
-            const waveform = document.querySelector('.waveform');
-            const bars = document.querySelectorAll('.bar');
+            // Create floating particles
+            const particlesContainer = document.getElementById('particles');
+            const particleCount = Math.floor(window.innerWidth / 20);
             
-            // Toggle play/pause
-            playButton.addEventListener('click', function() {
-                if (audio.paused) {
-                    audio.play();
-                    playButton.innerHTML = '<i class="fas fa-pause"></i>';
-                    waveform.style.animationPlayState = 'running';
-                    bars.forEach(bar => {
-                        bar.style.animationPlayState = 'running';
-                    });
-                } else {
-                    audio.pause();
-                    playButton.innerHTML = '<i class="fas fa-play"></i>';
-                    waveform.style.animationPlayState = 'paused';
-                    bars.forEach(bar => {
-                        bar.style.animationPlayState = 'paused';
-                    });
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.classList.add('particle');
+                
+                // Random size between 3px and 8px
+                const size = Math.random() * 5 + 3;
+                particle.style.width = `${size}px`;
+                particle.style.height = `${size}px`;
+                
+                // Random position
+                particle.style.left = `${Math.random() * 100}%`;
+                particle.style.top = `${Math.random() * 100}%`;
+                
+                // Random animation duration and delay
+                const duration = Math.random() * 20 + 10;
+                const delay = Math.random() * 5;
+                particle.style.animationDuration = `${duration}s`;
+                particle.style.animationDelay = `${delay}s`;
+                
+                // Random color variation
+                if (Math.random() > 0.7) {
+                    particle.style.background = `rgba(255, 61, 127, ${Math.random() * 0.5 + 0.3})`;
+                } else if (Math.random() > 0.7) {
+                    particle.style.background = `rgba(0, 255, 204, ${Math.random() * 0.5 + 0.3})`;
                 }
+                
+                particlesContainer.appendChild(particle);
+            }
+            
+            // Audio handling
+            const audio = document.getElementById('robotAudio');
+            const audioStatus = document.querySelector('.audio-status');
+            const playIcon = audioStatus.querySelector('i');
+            const statusText = audioStatus.querySelector('span');
+            
+            // Try to play audio on load
+            audio.play().catch(function(error) {
+                console.log("Autoplay failed, waiting for user interaction:", error);
+                audioStatus.innerHTML = `<i class="fas fa-volume-mute"></i><span>Tap screen to enable sound</span>`;
+                playIcon.style.color = '#ff3d7f';
+                
+                // Enable sound on first touch
+                document.body.addEventListener('touchstart', function enableAudio() {
+                    audio.play().then(() => {
+                        audioStatus.innerHTML = `<i class="fas fa-volume-up"></i><span>Robot voice playing...</span>`;
+                        playIcon.style.color = '#00ffcc';
+                    }).catch(e => console.log("Audio play failed after touch:", e));
+                    
+                    // Remove event listener after first touch
+                    document.body.removeEventListener('touchstart', enableAudio);
+                }, {once: true});
             });
             
-            // Reset button when audio ends
-            audio.addEventListener('ended', function() {
-                playButton.innerHTML = '<i class="fas fa-play"></i>';
-                waveform.style.animationPlayState = 'paused';
-                bars.forEach(bar => {
-                    bar.style.animationPlayState = 'paused';
-                });
+            // Add mouth animation when audio is playing
+            audio.addEventListener('playing', function() {
+                const mouth = document.querySelector('.mouth');
+                let isExpanded = false;
+                
+                setInterval(() => {
+                    if (audio.currentTime > 0.5 && audio.currentTime < 3.5) {
+                        mouth.style.height = isExpanded ? '25px' : '15px';
+                        isExpanded = !isExpanded;
+                    } else {
+                        mouth.style.height = '20px';
+                    }
+                }, 150);
             });
             
-            // Add animation to waveform on page load
-            setTimeout(() => {
-                waveform.style.animation = 'none';
-                setTimeout(() => {
-                    waveform.style.animation = 'pulse 3s infinite';
-                }, 10);
-            }, 1000);
-            
-            // Add interactive effect to robot eyes
+            // Robot eyes follow touch/mouse movement
+            const robotContainer = document.querySelector('.robot-container');
             const eyes = document.querySelectorAll('.eye');
+            
             document.addEventListener('mousemove', (e) => {
                 const xAxis = (window.innerWidth / 2 - e.pageX) / 25;
                 const yAxis = (window.innerHeight / 2 - e.pageY) / 25;
@@ -560,6 +457,24 @@
                     eye.style.transform = `translate(${xAxis}px, ${yAxis}px)`;
                 });
             });
+            
+            document.addEventListener('touchmove', (e) => {
+                if (e.touches.length > 0) {
+                    const xAxis = (window.innerWidth / 2 - e.touches[0].pageX) / 25;
+                    const yAxis = (window.innerHeight / 2 - e.touches[0].pageY) / 25;
+                    eyes.forEach(eye => {
+                        eye.style.transform = `translate(${xAxis}px, ${yAxis}px)`;
+                    });
+                }
+            }, { passive: true });
+            
+            // Reset eye position when not interacting
+            setInterval(() => {
+                eyes.forEach(eye => {
+                    if (!eye.style.transform || eye.style.transform === 'translate(0px, 0px)') return;
+                    eye.style.transform = 'translate(0px, 0px)';
+                });
+            }, 3000);
         });
     </script>
 </body>
