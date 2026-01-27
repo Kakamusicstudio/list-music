@@ -4,289 +4,304 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-width=1.0">
     
-    <title>Kaka Music Studio</title>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
-    <meta property="og:title" content="Kaka Music Game Studio">
-    <meta property="og:description" content="Dengarkan soundtrack terbaik kami.">
+    <title>Kaka Music Studio - Cyberpunk Edition</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <meta property="og:title" content="Kaka Music Game Studio - Cyberpunk">
+    <meta property="og:description" content="Dengarkan lagu dengan visual terbaik.">
     <meta property="og:image" content="https://via.placeholder.com/600x600/000000/00e5ff?text=Kaka+Music"> 
     <meta name="theme-color" content="#000000">
 
     <style>
-        /* --- RESET & SETUP --- */
+        /* --- RESET & BASE --- */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
         body {
-            font-family: 'Poppins', sans-serif;
-            background-color: #07070c;
+            font-family: 'Share Tech Mono', monospace; /* Font Coding */
+            background-color: #050505;
             color: #fff;
             height: 100vh;
+            overflow: hidden;
             display: flex;
             justify-content: center;
             align-items: center;
-            overflow: hidden;
-            /* Background base */
-            background: radial-gradient(circle at 50% -20%, #2a2a4a, #07070c);
         }
 
-        /* --- AUDIO REACT LAYERS (TRIK ANTI MATI) --- */
-        /* Layer 1: Flash effect (berdenyut) */
+        /* --- BACKGROUND EFFECTS (LAYERS) --- */
+        
+        /* 1. Moving Neon Grid (Lantai) */
+        #grid-bg {
+            position: fixed;
+            bottom: 0; left: 0; width: 100%; height: 50%;
+            background: 
+                linear-gradient(transparent 0%, #000 100%),
+                linear-gradient(0deg, rgba(0,255,255,0.3) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0,255,255,0.3) 1px, transparent 1px);
+            background-size: 100% 100%, 40px 40px, 40px 40px;
+            transform: perspective(500px) rotateX(60deg) translateY(100px) translateZ(-200px);
+            animation: gridMove 20s linear infinite;
+            z-index: -3;
+            opacity: 0.4;
+        }
+        @keyframes gridMove {
+            0% { background-position: 0 0, 0 0, 0 0; }
+            100% { background-position: 0 0, 0 40px, 40px 0; }
+        }
+
+        /* 2. Audio React Layer (Flash Berwarna) */
         #bgflash {
             position: fixed;
             inset: 0;
-            pointer-events: none;
             z-index: -2;
-            background: #07070c;
-            transition: background 0.1s;
-        }
-        
-        /* Layer 2: Grid Scan */
-        #ledscan {
-            position: fixed;
-            inset: 0;
             pointer-events: none;
+            mix-blend-mode: screen; /* Mode campur warna */
+        }
+
+        /* 3. CRT Scanlines (Garis TV) */
+        .scanlines {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            background-size: 100% 2px, 3px 100%;
+            z-index: 999;
+            pointer-events: none;
+        }
+
+        /* 4. Floating Particles */
+        .particle {
+            position: fixed;
+            width: 4px; height: 4px;
+            background: #fff;
+            border-radius: 50%;
+            box-shadow: 0 0 10px #0ff;
             z-index: -1;
-            background: repeating-linear-gradient(45deg, transparent 0 3px, rgba(0,255,255,0.08) 3px 6px);
+            animation: floatUp 5s linear infinite;
+        }
+        @keyframes floatUp {
+            0% { transform: translateY(100vh) scale(0); opacity: 0; }
+            50% { opacity: 1; }
+            100% { transform: translateY(-10vh) scale(1); opacity: 0; }
         }
 
         /* --- SPLASH SCREEN --- */
         #splash-screen {
             position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: #07070c;
-            z-index: 9999;
+            inset: 0;
+            background: #000;
+            z-index: 10000;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            text-align: center;
             transition: opacity 0.8s ease;
         }
 
         .splash-logo {
             font-family: 'Orbitron', sans-serif;
-            font-size: 3rem;
-            font-weight: 800;
-            color: #fff;
+            font-size: 3.5rem;
+            font-weight: 900;
+            color: #0ff;
             text-transform: uppercase;
             letter-spacing: 5px;
-            margin-bottom: 10px;
-            text-shadow: 0 0 20px #00e5ff;
-            animation: pulse 2s infinite;
+            text-shadow: 
+                2px 2px 0px #f0f, 
+                -2px -2px 0px #0ff;
+            animation: glitch 1s infinite alternate;
         }
-
-        .splash-subtitle {
-            color: #00e5ff;
-            font-size: 1rem;
-            margin-bottom: 50px;
-            letter-spacing: 2px;
+        @keyframes glitch {
+            0% { text-shadow: 2px 2px 0px #f0f, -2px -2px 0px #0ff; transform: skew(0deg); }
+            20% { text-shadow: 2px -2px 0px #f0f, -2px 2px 0px #0ff; transform: skew(-10deg); }
+            40% { text-shadow: -2px 2px 0px #f0f, 2px -2px 0px #0ff; transform: skew(10deg); }
+            60% { text-shadow: -2px -2px 0px #f0f, 2px 2px 0px #0ff; transform: skew(0deg); }
         }
 
         .btn-start {
-            background: #00e5ff;
-            color: #000;
-            border: none;
-            padding: 18px 36px;
-            font-size: 18px;
-            border-radius: 14px;
-            font-weight: 700;
+            margin-top: 40px;
+            background: transparent;
+            color: #0ff;
+            border: 2px solid #0ff;
+            padding: 15px 40px;
+            font-size: 1.2rem;
+            font-family: 'Orbitron', sans-serif;
+            text-transform: uppercase;
             cursor: pointer;
-            box-shadow: 0 0 25px #00e5ff;
-            transition: .2s;
+            position: relative;
+            overflow: hidden;
+            transition: 0.3s;
+            box-shadow: 0 0 15px #0ff;
         }
-        .btn-start:hover { transform: scale(1.05); box-shadow: 0 0 40px #00e5ff; }
-
-        @keyframes pulse {
-            0% { text-shadow: 0 0 10px #00e5ff; transform: scale(1); }
-            50% { text-shadow: 0 0 30px #00e5ff; transform: scale(1.05); }
-            100% { text-shadow: 0 0 10px #00e5ff; transform: scale(1); }
-        }
-
-        /* --- PLAYER CONTAINER --- */
-        :root {
-            --primary: #00e5ff;
-            --secondary: #ff0055;
-            --text-muted: #8888aa;
+        .btn-start:hover {
+            background: #0ff;
+            color: #000;
+            box-shadow: 0 0 40px #0ff, 0 0 80px #f0f;
         }
 
+        /* --- PLAYER CARD (HOLOGRAPHIC) --- */
         .player-container {
             width: 90%;
             max-width: 400px;
-            background: rgba(20, 15, 30, 0.85);
-            backdrop-filter: blur(15px);
-            border-radius: 20px;
-            padding: 30px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(10, 10, 20, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(0, 255, 255, 0.3);
+            border-radius: 10px;
+            padding: 25px;
             text-align: center;
             position: relative;
-            /* Efek Glow yang berdenyut nanti diatur via JS */
-            transition: box-shadow 0.1s;
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.1);
+            transition: all 0.1s; /* Cepat untuk audio react */
         }
 
-        .header { margin-bottom: 20px; }
+        /* Dekorasi Sudut Player */
+        .player-container::before, .player-container::after {
+            content: ''; position: absolute; width: 20px; height: 20px;
+            border: 2px solid #f0f; transition: 0.3s;
+        }
+        .player-container::before { top: -2px; left: -2px; border-right: none; border-bottom: none; }
+        .player-container::after { bottom: -2px; right: -2px; border-left: none; border-top: none; }
+
         .header h1 {
             font-family: 'Orbitron', sans-serif;
-            font-size: 1.5rem;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            background: linear-gradient(90deg, var(--primary), var(--secondary));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            font-weight: 800;
+            font-size: 1.2rem;
+            color: #fff;
+            letter-spacing: 4px;
+            margin-bottom: 20px;
+            text-shadow: 0 0 10px #f0f;
         }
 
+        /* Cover Art Holographic */
         .cover-wrapper {
+            position: relative;
             width: 100%;
             aspect-ratio: 1/1;
-            border-radius: 15px;
-            overflow: hidden;
-            margin-bottom: 25px;
-            box-shadow: 0 8px 20px rgba(0, 229, 255, 0.2);
-            position: relative;
+            margin-bottom: 20px;
         }
-
-        .cover-img {
-            width: 100%;
-            height: 100%;
+        .cover-wrapper img {
+            width: 100%; height: 100%;
             object-fit: cover;
-            transition: transform 0.5s ease;
-        }
-        .cover-wrapper:hover .cover-img { transform: scale(1.05); }
-
-        .song-info { margin-bottom: 20px; }
-        .song-title {
-            font-size: 1.4rem;
-            font-weight: 700;
-            margin-bottom: 5px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        .artist-name { font-size: 0.9rem; color: var(--primary); margin-bottom: 2px; }
-        .album-name { font-size: 0.8rem; color: var(--text-muted); }
-
-        .progress-container {
-            width: 100%;
-            height: 5px;
-            background: #33334d;
             border-radius: 5px;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        /* Efek Overlay di Cover */
+        .cover-wrapper::after {
+            content: ''; position: absolute; inset: 0;
+            background: linear-gradient(135deg, rgba(255,0,255,0.2), rgba(0,255,255,0.2));
+            mix-blend-mode: overlay;
+            pointer-events: none;
+        }
+
+        .song-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.3rem;
+            color: #fff;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+        }
+        .artist-name { color: #0ff; font-size: 0.9rem; letter-spacing: 1px; }
+        .album-name { color: #f0f; font-size: 0.8rem; margin-bottom: 15px; }
+
+        /* Progress Bar Cyber */
+        .progress-container {
+            width: 100%; height: 6px;
+            background: #111;
+            border-radius: 3px;
             margin-bottom: 10px;
             cursor: pointer;
-            position: relative;
+            overflow: hidden;
+            border: 1px solid #333;
         }
         .progress-bar {
             height: 100%;
-            background: linear-gradient(90deg, var(--primary), var(--secondary));
-            border-radius: 5px;
+            background: linear-gradient(90deg, #f0f, #0ff);
             width: 0%;
-            position: relative;
+            box-shadow: 0 0 10px #0ff;
         }
+
         .time-stamps {
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.75rem;
-            color: var(--text-muted);
+            display: flex; justify-content: space-between;
+            font-size: 0.75rem; color: #888;
             margin-bottom: 20px;
+            font-family: 'Share Tech Mono', monospace;
         }
 
-        .controls {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 20px;
-        }
-
+        /* Controls */
+        .controls { display: flex; justify-content: space-between; align-items: center; padding: 0 10px; }
+        
         .btn {
-            background: none;
-            border: none;
-            color: #fff;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            background: none; border: none;
+            color: #0ff; cursor: pointer;
+            transition: 0.3s; filter: drop-shadow(0 0 5px #0ff);
         }
-        .btn:hover { color: var(--primary); transform: scale(1.1); }
+        .btn:hover { color: #fff; filter: drop-shadow(0 0 15px #fff); transform: scale(1.2); }
 
         .btn-main {
-            width: 60px;
-            height: 60px;
+            width: 70px; height: 70px;
             border-radius: 50%;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            box-shadow: 0 0 15px rgba(0, 229, 255, 0.4);
+            background: rgba(0,0,0,0.5);
+            border: 2px solid #f0f;
+            color: #fff;
             font-size: 24px;
-            color: #000;
+            box-shadow: 0 0 15px #f0f;
         }
-        .btn-main:hover { color: #000; box-shadow: 0 0 25px rgba(255, 0, 85, 0.6); }
+        .btn-main:hover {
+            background: #f0f; color: #000;
+            box-shadow: 0 0 30px #f0f;
+        }
 
         .playlist-toggle {
-            margin-top: 20px;
-            font-size: 0.9rem;
-            color: var(--text-muted);
-            text-decoration: underline;
-            cursor: pointer;
+            margin-top: 20px; color: #f0f;
+            font-size: 0.8rem; text-transform: uppercase;
+            cursor: pointer; letter-spacing: 2px;
         }
+        .playlist-toggle:hover { color: #fff; text-shadow: 0 0 10px #f0f; }
 
         .playlist-box {
-            max-height: 0;
-            overflow-y: auto;
-            transition: max-height 0.3s ease;
-            margin-top: 10px;
-            border-top: 1px solid rgba(255,255,255,0.1);
+            max-height: 0; overflow-y: auto;
+            border-top: 1px solid rgba(255,0,255,0.3);
+            transition: max-height 0.3s;
         }
         .playlist-box.open { max-height: 200px; padding-top: 10px; }
 
         .playlist-item {
-            display: flex;
-            align-items: center;
-            padding: 10px;
+            display: flex; align-items: center; padding: 10px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
             cursor: pointer;
-            border-radius: 8px;
-            transition: background 0.2s;
         }
-        .playlist-item:hover { background: rgba(255,255,255,0.05); }
-        .playlist-item.active {
-            background: rgba(0, 229, 255, 0.1);
-            border-left: 3px solid var(--primary);
-        }
-        .item-thumb {
-            width: 40px;
-            height: 40px;
-            border-radius: 4px;
-            margin-right: 10px;
-            object-fit: cover;
-        }
+        .playlist-item:hover { background: rgba(0,255,255,0.1); }
+        .playlist-item.active { border-left: 3px solid #f0f; background: rgba(255,0,255,0.1); }
+        .item-thumb { width: 40px; height: 40px; margin-right: 10px; object-fit: cover; border-radius: 4px; }
         .item-info { text-align: left; flex: 1; }
         .item-title { font-size: 0.9rem; color: #fff; }
-        .item-artist { font-size: 0.75rem; color: var(--text-muted); }
+        .item-artist { font-size: 0.75rem; color: #0ff; }
+
+        body.splash-active .player-container { display: none; }
 
         svg { width: 24px; height: 24px; fill: currentColor; }
         .btn-main svg { width: 28px; height: 28px; }
-
-        body.splash-active .player-container { display: none; }
 
     </style>
 </head>
 <body class="splash-active">
 
-    <!-- AUDIO REACT LAYERS -->
+    <!-- BACKGROUND LAYERS -->
+    <div id="grid-bg"></div>
     <div id="bgflash"></div>
-    <div id="ledscan"></div>
+    <div class="scanlines"></div>
+    <div id="particles-container"></div>
 
     <!-- SPLASH SCREEN -->
     <div id="splash-screen">
         <div class="splash-logo">KAKA STUDIO</div>
-        <div class="splash-subtitle">Game Soundtrack Experience</div>
-        <button class="btn-start" onclick="startExperience()">MULAI DENGARKAN ▶</button>
+        <div style="color:#f0f; margin-top:10px; font-family:'Share Tech Mono'">SYSTEM INITIATED...</div>
+        <button class="btn-start" onclick="startExperience()">INITIALIZE ▶</button>
     </div>
 
+    <!-- PLAYER CONTAINER -->
     <div class="player-container">
         <div class="header">
-            <h1>Kaka Studio</h1>
+            <h1>CYBER PLAYER v2.0</h1>
         </div>
 
         <div class="cover-wrapper">
-            <img src="" alt="Album Art" class="cover-img" id="cover">
+            <img src="" alt="Cover" class="cover-img" id="cover">
         </div>
 
         <div class="song-info">
@@ -299,8 +314,8 @@
             <div class="progress-bar" id="progress"></div>
         </div>
         <div class="time-stamps">
-            <span id="curr-time">0:00</span>
-            <span id="dur-time">0:00</span>
+            <span id="curr-time">00:00</span>
+            <span id="dur-time">00:00</span>
         </div>
 
         <div class="controls">
@@ -318,36 +333,37 @@
             </button>
         </div>
 
-        <div class="playlist-toggle" onclick="togglePlaylist()">Lihat Daftar Lagu ▼</div>
+        <div class="playlist-toggle" onclick="togglePlaylist()">ACCESS DATA ►</div>
         <div class="playlist-box" id="playlist-box"></div>
     </div>
 
     <script>
-        // --- KONFIGURASI LAGU ---
+        // --- SONG DATA ---
         const songs = [
             {
-                title: "Battle of the Ancients",
-                artist: "Kaka Composer",
-                album: "Epic Soundtrack Vol. 1",
-                cover: "https://picsum.photos/seed/game1/300/300",
+                title: "Neon Tokyo Drift",
+                artist: "Kaka Synth",
+                album: "Future City",
+                cover: "https://picsum.photos/seed/cyber1/300/300",
                 src: "welcome-robot.mp3" 
             },
             {
-                title: "Neon City Night",
-                artist: "Cyber Band",
-                album: "Synthwave Collection",
-                cover: "https://picsum.photos/seed/game2/300/300",
+                title: "Cyber Rage",
+                artist: "Glitch Mob",
+                album: "System Override",
+                cover: "https://picsum.photos/seed/cyber2/300/300",
                 src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3"
             },
             {
-                title: "Puzzle Theme",
-                artist: "Studio Orchestra",
-                album: "Casual Games",
-                cover: "https://picsum.photos/seed/game3/300/300",
+                title: "Night City Rain",
+                artist: "Neural Net",
+                album: "AI Dreams",
+                cover: "https://picsum.photos/seed/cyber3/300/300",
                 src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3"
             }
         ];
 
+        // --- DOM ELEMENTS ---
         const cover = document.getElementById('cover');
         const title = document.getElementById('title');
         const artist = document.getElementById('artist');
@@ -362,6 +378,8 @@
         const playIcon = document.getElementById('play-icon');
         const pauseIcon = document.getElementById('pause-icon');
         const playlistBox = document.getElementById('playlist-box');
+        const bgflash = document.getElementById('bgflash');
+        const particlesContainer = document.getElementById('particles-container');
 
         let songIndex = 0;
         let isPlaying = false;
@@ -369,6 +387,7 @@
         
         loadSong(songs[songIndex]);
 
+        // --- PLAYER LOGIC ---
         function loadSong(song) {
             title.innerText = song.title;
             artist.innerText = song.artist;
@@ -380,10 +399,9 @@
 
         function playSong() {
             isPlaying = true;
-            audio.play().catch(e => console.log("Play error:", e));
+            audio.play().catch(e => console.log(e));
             playIcon.style.display = 'none';
             pauseIcon.style.display = 'block';
-            cover.style.transform = "scale(1.05)";
         }
 
         function pauseSong() {
@@ -391,7 +409,6 @@
             audio.pause();
             playIcon.style.display = 'block';
             pauseIcon.style.display = 'none';
-            cover.style.transform = "scale(1)";
         }
 
         function prevSong() {
@@ -413,16 +430,16 @@
             if (isNaN(duration)) return;
             const progressPercent = (currentTime / duration) * 100;
             progressBar.style.width = `${progressPercent}%`;
+            
+            const currMin = Math.floor(currentTime / 60);
+            let currSec = Math.floor(currentTime % 60);
+            if (currSec < 10) currSec = `0${currSec}`;
+            const durMin = Math.floor(duration / 60);
+            let durSec = Math.floor(duration % 60);
+            if (durSec < 10) durSec = `0${durSec}`;
 
-            const currentMin = Math.floor(currentTime / 60);
-            let currentSec = Math.floor(currentTime % 60);
-            if (currentSec < 10) currentSec = `0${currentSec}`;
-            const durationMin = Math.floor(duration / 60);
-            let durationSec = Math.floor(duration % 60);
-            if (durationSec < 10) durationSec = `0${durationSec}`;
-
-            currTime.innerText = `${currentMin}:${currentSec}`;
-            durTime.innerText = `${durationMin}:${durationSec}`;
+            currTime.innerText = `${currMin}:${currSec}`;
+            durTime.innerText = `${durMin}:${durSec}`;
         }
 
         function setProgress(e) {
@@ -467,94 +484,94 @@
             playlistBox.classList.toggle('open');
         }
 
-        playBtn.addEventListener('click', () => {
-            if (isPlaying) pauseSong();
-            else playSong();
-        });
-
+        playBtn.addEventListener('click', () => { isPlaying ? pauseSong() : playSong(); });
         prevBtn.addEventListener('click', prevSong);
         nextBtn.addEventListener('click', nextSong);
-
         audio.addEventListener('timeupdate', updateProgress);
         audio.addEventListener('ended', nextSong);
         progressContainer.addEventListener('click', setProgress);
 
         generatePlaylist();
 
-        // --- AUDIO REACT ENGINE (ANTI MATI & WA LAYAR) ---
-        let audioContext;
-        let analyser;
-        let dataArray;
+        // --- PARTICLES GENERATOR ---
+        for(let i=0; i<30; i++){
+            const p = document.createElement('div');
+            p.classList.add('particle');
+            p.style.left = Math.random() * 100 + '%';
+            p.style.animationDuration = (Math.random() * 5 + 3) + 's';
+            p.style.animationDelay = Math.random() * 2 + 's';
+            p.style.background = Math.random() > 0.5 ? '#0ff' : '#f0f';
+            particlesContainer.appendChild(p);
+        }
+
+        // --- CYBER AUDIO REACT ENGINE ---
+        let audioCtx, analyser, dataArray;
 
         function startAudioReact() {
-            // Inisialisasi AudioContext
             const AudioContext = window.AudioContext || window.webkitAudioContext;
-            audioContext = new AudioContext();
+            audioCtx = new AudioContext();
+            const src = audioCtx.createMediaElementSource(audio);
+            analyser = audioCtx.createAnalyser();
             
-            // Hubungkan Audio Element ke Analyser
-            const source = audioContext.createMediaElementSource(audio);
-            analyser = audioContext.createAnalyser();
+            src.connect(analyser);
+            analyser.connect(audioCtx.destination);
             
-            source.connect(analyser);
-            analyser.connect(audioContext.destination);
-            
-            // Konfigurasi Frekuensi
-            analyser.fftSize = 256;
+            analyser.fftSize = 512;
             const bufferLength = analyser.frequencyBinCount;
             dataArray = new Uint8Array(bufferLength);
 
-            // Jalankan Loop Animasi Visual
-            animateAudio();
+            animateCyber();
         }
 
-        function animateAudio() {
-            requestAnimationFrame(animateAudio);
-            
+        function animateCyber() {
+            requestAnimationFrame(animateCyber);
+
             if (!isPlaying) {
-                // Jika pause, redupkan background
-                document.getElementById('bgflash').style.background = "rgba(0,0,0,0)";
-                document.querySelector('.player-container').style.boxShadow = "0 10px 40px rgba(0,0,0,0.5)";
+                bgflash.style.backgroundColor = "transparent";
+                document.querySelector('.player-container').style.boxShadow = "0 0 20px rgba(0, 255, 255, 0.1)";
                 return;
             }
 
-            // Ambil Data Frekuensi Audio
             analyser.getByteFrequencyData(dataArray);
 
-            // Hitung rata-rata volume untuk kekuatan flash
-            let sum = 0;
-            for(let i = 0; i < dataArray.length; i++) {
-                sum += dataArray[i];
+            // Hitung energi bass (frekuensi rendah) untuk efek ledakan
+            let bass = 0;
+            for(let i = 0; i < 20; i++) { bass += dataArray[i]; }
+            bass = bass / 20; // Rata-rata bass
+
+            // --- EFFECT 1: BG FLASH COLORFUL ---
+            // Gunakan HSL untuk rotasi warna
+            // Hue berubah berdasarkan waktu, Lightness berdasarkan Bass
+            const hue = (Date.now() / 20) % 360; // Warna berputar
+            const light = Math.min(50, bass / 5); // Kecerahan mengikuti musik
+            const alpha = Math.min(0.4, bass / 100); // Transparansi
+
+            bgflash.style.backgroundColor = `hsla(${hue}, 100%, 50%, ${alpha})`;
+
+            // --- EFFECT 2: PLAYER BOX GLOW ---
+            // Cahaya di box pemutar ikut denyut bass
+            const glowSize = 20 + (bass * 1.5);
+            const glowColor = `hsla(${hue + 180}, 100%, 50%, 0.8)`; // Warna komplementer
+            document.querySelector('.player-container').style.boxShadow = 
+                `0 0 ${glowSize}px ${glowColor}, inset 0 0 ${glowSize/2}px rgba(255,255,255,0.2)`;
+                
+            // --- EFFECT 3: TITLE GLITCH TRIGGER ---
+            // Jika bass tinggi, title sedikit bergetar
+            if(bass > 200) {
+                const jitterX = Math.random() * 4 - 2;
+                const jitterY = Math.random() * 4 - 2;
+                document.querySelector('.song-title').style.transform = `translate(${jitterX}px, ${jitterY}px)`;
+            } else {
+                document.querySelector('.song-title').style.transform = `translate(0,0)`;
             }
-            const average = sum / dataArray.length;
-
-            // --- VISUAL EFFECT 1: BG FLASH ---
-            // Warna berubah random tapi tetap dalam nuansa gelap/cyan
-            const r = 7;
-            const g = 7 + (average / 2); // Hijau kebiruan
-            const b = 12 + average;       // Biru mendominasi
-            const opacity = Math.min(0.3, average / 255); // Transparansi mengikuti volume
-
-            document.getElementById('bgflash').style.background = `rgba(${r},${g},${b},${opacity})`;
-
-            // --- VISUAL EFFECT 2: BOX GLOW ---
-            // Box player ikut berdenyut
-            const glowSize = 10 + (average / 5);
-            const glowColor = `rgba(0, 229, 255, ${Math.min(0.8, average / 200)})`;
-            document.querySelector('.player-container').style.boxShadow = `0 0 ${glowSize}px ${glowColor}`;
         }
 
-        // --- START BUTTON ---
         function startExperience() {
-            // 1. Mulai Audio Player
             playSong();
-            
-            // 2. Jalankan Audio React (Kunci Agar Musik Tetap Hidup)
             startAudioReact();
-
-            // 3. Hilangkan Splash Screen
+            
             const splash = document.getElementById('splash-screen');
             splash.style.opacity = '0';
-            
             setTimeout(() => {
                 splash.style.display = 'none';
                 document.body.classList.remove('splash-active');
