@@ -4,413 +4,457 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
-    <title>Kaka Music Studio</title>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
-    <meta property="og:title" content="Kaka Music Game Studio">
-    <meta property="og:description" content="Dengarkan soundtrack terbaik kami.">
-    <meta property="og:image" content="https://via.placeholder.com/600x600/000000/00e5ff?text=Kaka+Music"> 
-    <meta name="theme-color" content="#000000">
+    <title>Kaka Music Archive | Infinite Stream</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <meta property="og:title" content="Kaka Music Archive">
+    <meta property="og:description" content="Infinite Streaming Experience.">
+    <meta property="og:image" content="https://via.placeholder.com/600x600/0a0a0a/00e5ff?text=KAKA+ARCHIVE"> 
+    <meta name="theme-color" content="#0a0a0a">
 
     <style>
-        /* --- RESET & SETUP (COCOKAN CONTOH) --- */
-        *{margin:0;padding:0;box-sizing:border-box}
+        /* --- ARCHIVE STYLE MINIMALIS --- */
+        :root {
+            --bg: #0a0a0a;
+            --text: #e0e0e0;
+            --accent: #00e5ff; /* Kaka Cyan */
+            --accent-dim: #005f66;
+            --border: #333;
+            --hover: #1a1a1a;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; outline: none; }
         
-        body{
-          font-family:'Poppins',sans-serif;
-          background:#07070c;
-          color:#fff;
-          min-height:100vh;
-          overflow-x:hidden;
-        }
-
-        /* AUDIO REACT LAYERS (DARI CONTOH) */
-        #bgflash,#scanbar,#ledscan{
-          position:fixed;inset:0;pointer-events:none
-        }
-        #bgflash{z-index:-3;background:#07070c}
-        #scanbar{z-index:-2;background:linear-gradient(90deg,transparent 45%,rgba(0,255,255,.25) 50%,transparent 55%)}
-        #ledscan{z-index:-1;background:repeating-linear-gradient(45deg,transparent 0 3px,rgba(0,255,255,.08) 3px 6px)}
-
-        /* --- SPLASH SCREEN --- */
-        #play-screen{
-          position:fixed;
-          inset:0;
-          background:#07070c;
-          display:flex;
-          align-items:center;
-          justify-content:center;
-          z-index:9999;
-        }
-        #play-screen button{
-          padding:18px 36px;
-          font-size:18px;
-          border:none;
-          border-radius:14px;
-          background:#0ff;
-          color:#000;
-          font-weight:700;
-          cursor:pointer;
-          font-family:'Orbitron',sans-serif;
-        }
-
-        /* --- PLAYER UI (TAMPILAN KAKA) --- */
-        .section{
-          padding:24px 16px;
-          text-align:center;
-          display:none; /* Sembunyikan dulu */
-        }
-        
-        .card{
-          background:rgba(20,15,30,.95);
-          margin-top:18px;
-          padding:20px;
-          border-radius:18px;
-          box-shadow:0 0 30px #0ff,0 0 70px #ff0;
-          transition:.2s;
-          border: 1px solid rgba(255,255,255,0.1);
-        }
-
-        .cover-wrapper {
-            width: 100%;
-            aspect-ratio: 1/1;
-            border-radius: 15px;
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
             overflow: hidden;
-            margin-bottom: 20px;
-            box-shadow: 0 8px 20px rgba(0, 229, 255, 0.2);
-        }
-        .cover-img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
         }
 
-        .song-title {
-            font-family: 'Orbitron', sans-serif;
+        /* HEADER */
+        header {
+            padding: 15px 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(10,10,10,0.95);
+            z-index: 10;
+        }
+        .brand {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: var(--accent);
+            letter-spacing: -1px;
+        }
+        .status-dot {
+            width: 8px; height: 8px;
+            background: #333;
+            border-radius: 50%;
+            box-shadow: 0 0 5px #333;
+            transition: 0.3s;
+        }
+        .status-dot.active {
+            background: var(--accent);
+            box-shadow: 0 0 10px var(--accent);
+        }
+
+        /* MAIN LAYOUT */
+        main {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+        }
+
+        /* SIDEBAR (PLAYLIST) */
+        .sidebar {
+            width: 300px;
+            border-right: 1px solid var(--border);
+            overflow-y: auto;
+            background: var(--bg);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .track-list {
+            list-style: none;
+            padding: 10px;
+        }
+
+        .track-item {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            border-bottom: 1px solid #151515;
+            transition: 0.2s;
+        }
+        .track-item:hover { background: var(--hover); }
+        .track-item.active {
+            background: rgba(0, 229, 255, 0.1);
+            border-left: 3px solid var(--accent);
+        }
+
+        .track-info { flex: 1; margin-left: 10px; }
+        .track-title { font-size: 0.9rem; font-weight: 600; margin-bottom: 2px; }
+        .track-meta { font-size: 0.75rem; color: #666; font-family: 'JetBrains Mono', monospace; }
+
+        /* PLAYER AREA */
+        .player-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            background: radial-gradient(circle at center, #111, var(--bg));
+        }
+
+        .visualizer-container {
+            width: 300px; height: 300px;
+            border-radius: 50%;
+            border: 2px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            box-shadow: 0 0 50px rgba(0,0,0,0.5);
+            transition: 0.1s;
+        }
+        
+        .visualizer-ring {
+            position: absolute;
+            inset: -10px;
+            border-radius: 50%;
+            border: 1px dashed var(--accent-dim);
+            animation: rotate 10s linear infinite;
+        }
+        
+        @keyframes rotate { 100% { transform: rotate(360deg); } }
+
+        .cover-art {
+            width: 90%; height: 90%;
+            border-radius: 50%;
+            object-fit: cover;
+            opacity: 0.8;
+        }
+
+        .now-playing {
+            margin-top: 30px;
+            text-align: center;
+        }
+        .now-playing h2 {
             font-size: 1.5rem;
             margin-bottom: 5px;
-            text-shadow: 0 0 10px #0ff;
+            color: #fff;
         }
-        .artist-name { color: #0ff; font-size: 1rem; margin-bottom: 15px; }
+        .now-playing p { color: var(--accent); font-family: 'JetBrains Mono', monospace; }
 
-        .progress-container {
-            width: 100%;
-            height: 5px;
-            background: #333;
-            border-radius: 5px;
-            margin-bottom: 10px;
-            cursor: pointer;
-        }
-        .progress-bar {
-            height: 100%;
-            background: #0ff;
-            border-radius: 5px;
-            width: 0%;
-        }
-        .time-stamps {
-            display: flex; justify-content: space-between;
-            font-size: 0.8rem; color: #888; margin-bottom: 20px;
-            font-family:'Share Tech Mono', monospace;
-        }
-
+        /* CONTROLS */
         .controls {
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 0 20px;
+            margin-top: 40px;
+            display: flex;
+            gap: 30px;
+            align-items: center;
         }
-
-        .btn {
-            background: none; border: none; color: #fff;
-            cursor: pointer; transition: .2s;
+        
+        .btn-ctrl {
+            background: none; border: none;
+            color: #666; cursor: pointer; transition: 0.2s;
         }
-        .btn:hover { color: #0ff; transform: scale(1.1); }
-
-        .btn-main {
+        .btn-ctrl:hover { color: #fff; }
+        .btn-play {
             width: 60px; height: 60px;
             border-radius: 50%;
-            background: linear-gradient(135deg, #0ff, #0099ff);
-            display: flex; align-items: center; justify-content: center;
+            background: var(--text);
+            color: var(--bg);
             font-size: 24px;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 0 20px rgba(255,255,255,0.1);
+        }
+        .btn-play:hover {
+            background: var(--accent);
+            box-shadow: 0 0 30px var(--accent);
             color: #000;
-            box-shadow: 0 0 20px #0ff;
-        }
-        .btn-main:hover { color: #000; box-shadow: 0 0 40px #0ff; }
-
-        .playlist-toggle {
-            margin-top: 20px; font-size: 0.9rem;
-            color: #f0f; cursor: pointer; text-decoration: underline;
         }
 
-        .playlist-box {
-            max-height: 0; overflow-y: auto;
-            border-top: 1px solid rgba(255,255,255,0.1);
-            transition: max-height 0.3s;
+        /* PROGRESS BAR (ARCHIVE STYLE) */
+        .waveform-container {
+            width: 80%; max-width: 600px;
+            height: 40px;
+            background: #111;
+            margin-top: 30px;
+            position: relative;
+            border: 1px solid var(--border);
+            overflow: hidden;
+            cursor: pointer;
+            display: flex; align-items: center;
         }
-        .playlist-box.open { max-height: 200px; padding-top: 10px; }
-
-        .playlist-item {
-            display: flex; align-items: center; padding: 10px;
-            cursor: pointer; border-radius: 5px;
+        .waveform-bar {
+            height: 60%; background: #333; width: 2px; margin: 0 1px;
+            flex: 1; transition: 0.1s;
         }
-        .playlist-item:hover { background: rgba(255,255,255,0.05); }
-        .playlist-item.active { border-left: 3px solid #0ff; background: rgba(0,255,255,0.1); }
-        .item-thumb { width: 40px; height: 40px; margin-right: 10px; object-fit: cover; border-radius: 4px; }
-        .item-info { text-align: left; flex: 1; }
-        .item-title { font-size: 0.9rem; color: #fff; }
-        .item-artist { font-size: 0.75rem; color: #888; }
+        .waveform-container:hover .waveform-bar { background: #444; }
+        .progress-overlay {
+            position: absolute; top: 0; left: 0; height: 100%;
+            background: rgba(0, 229, 255, 0.2);
+            width: 0%;
+            pointer-events: none;
+            border-right: 2px solid var(--accent);
+        }
 
-        svg { width: 24px; height: 24px; fill: currentColor; }
-        .btn-main svg { width: 28px; height: 28px; }
+        /* TECH DETAILS (HIDDEN ENGINE) */
+        #hidden-audio { display: none; }
+
+        /* MOBILE RESPONSIVE */
+        @media (max-width: 768px) {
+            main { flex-direction: column-reverse; }
+            .sidebar { width: 100%; height: 40%; border-right: none; border-top: 1px solid var(--border); }
+            .player-area { height: 60%; }
+            .visualizer-container { width: 200px; height: 200px; }
+            .controls { gap: 20px; }
+            .waveform-container { height: 30px; }
+        }
 
     </style>
 </head>
 <body>
 
-    <!-- 1. AUDIO ELEMENT (PENTING: DI BODY, BUKAN DI JS) -->
-    <audio id="bgm" loop></audio>
+    <header>
+        <div class="brand">KAKA MUSIC ARCHIVE // V.1.0</div>
+        <div class="status-dot" id="status-dot"></div>
+    </header>
 
-    <!-- 2. LAYERS AUDIO REACT -->
-    <div id="bgflash"></div>
-    <div id="scanbar"></div>
-    <div id="ledscan"></div>
+    <main>
+        <!-- SIDEBAR: TRACK LIST -->
+        <div class="sidebar">
+            <ul class="track-list" id="track-list">
+                <!-- Javascript will inject tracks here -->
+            </ul>
+        </div>
 
-    <!-- 3. SPLASH SCREEN (START) -->
-    <div id="play-screen">
-        <button onclick="startExperience()">MULAI DENGARKAN ▶</button>
-    </div>
-
-    <!-- 4. MAIN PLAYER CONTENT -->
-    <div class="section" id="main-content">
-        <div class="card">
-            <div class="cover-wrapper">
-                <img src="" alt="Album Art" class="cover-img" id="cover">
+        <!-- MAIN: PLAYER -->
+        <div class="player-area">
+            <div class="visualizer-container" id="viz-container">
+                <div class="visualizer-ring"></div>
+                <img src="" alt="Cover" class="cover-art" id="cover">
             </div>
 
-            <div class="song-info">
-                <div class="song-title" id="title">Loading...</div>
-                <div class="artist-name" id="artist">Artist</div>
+            <div class="now-playing">
+                <h2 id="track-title">Select Track</h2>
+                <p id="track-artist">SYSTEM READY</p>
             </div>
 
-            <div class="progress-container" id="progress-container">
-                <div class="progress-bar" id="progress"></div>
-            </div>
-            <div class="time-stamps">
-                <span id="curr-time">00:00</span>
-                <span id="dur-time">00:00</span>
+            <div class="waveform-container" id="waveform">
+                <!-- Fake bars generated by JS -->
+                <div class="progress-overlay" id="progress-ov"></div>
             </div>
 
             <div class="controls">
-                <button class="btn" id="prev">
-                    <svg viewBox="0 0 24 24"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>
-                </button>
-
-                <button class="btn btn-main" id="play-pause">
-                    <svg id="play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-                    <svg id="pause-icon" viewBox="0 0 24 24" style="display:none"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
-                </button>
-
-                <button class="btn" id="next">
-                    <svg viewBox="0 0 24 24"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
-                </button>
+                <button class="btn-ctrl" id="prev">PREV</button>
+                <button class="btn-play" id="play-btn">▶</button>
+                <button class="btn-ctrl" id="next">NEXT</button>
             </div>
-
-            <div class="playlist-toggle" onclick="togglePlaylist()">SHOW PLAYLIST ▼</div>
-            <div class="playlist-box" id="playlist-box"></div>
         </div>
-    </div>
+    </main>
+
+    <!-- AUDIO ELEMENT (THE ENGINE) -->
+    <audio id="audio-engine" preload="auto"></audio>
 
     <script>
-        // --- 1. DATA LAGU (CONFIG) ---
-        const songs = [
-            {
-                title: "Welcome Robot",
-                artist: "Kaka Composer",
-                cover: "https://picsum.photos/seed/kaka1/300/300",
-                src: "welcome-robot.mp3" 
-            },
-            {
-                title: "Neon City Night",
-                artist: "Cyber Band",
-                cover: "https://picsum.photos/seed/kaka2/300/300",
-                src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3"
-            },
-            {
-                title: "Puzzle Theme",
-                artist: "Studio Orchestra",
-                cover: "https://picsum.photos/seed/kaka3/300/300",
-                src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3"
-            }
+        /* 
+         * KAKA ARCHIVE PROTOCOL 
+         * Infinite Streaming Engine 
+         */
+
+        // --- CONFIG ---
+        const tracks = [
+            { title: "Welcome Robot", artist: "Kaka Composer", src: "welcome-robot.mp3", cover: "https://picsum.photos/seed/kaka1/300/300" },
+            { title: "Neon City Night", artist: "Cyber Band", src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3", cover: "https://picsum.photos/seed/kaka2/300/300" },
+            { title: "Puzzle Theme", artist: "Studio Orchestra", src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3", cover: "https://picsum.photos/seed/kaka3/300/300" }
         ];
 
-        // --- 2. DOM ELEMENTS ---
-        const bgm = document.getElementById('bgm'); // AUDIO FISIK
-        const cover = document.getElementById('cover');
-        const title = document.getElementById('title');
-        const artist = document.getElementById('artist');
-        const progressContainer = document.getElementById('progress-container');
-        const progressBar = document.getElementById('progress');
-        const currTime = document.getElementById('curr-time');
-        const durTime = document.getElementById('dur-time');
-        const playPauseBtn = document.getElementById('play-pause');
+        // --- DOM ---
+        const audio = document.getElementById('audio-engine');
+        const playBtn = document.getElementById('play-btn');
         const prevBtn = document.getElementById('prev');
         const nextBtn = document.getElementById('next');
-        const playIcon = document.getElementById('play-icon');
-        const pauseIcon = document.getElementById('pause-icon');
-        const playlistBox = document.getElementById('playlist-box');
+        const trackList = document.getElementById('track-list');
+        const cover = document.getElementById('cover');
+        const titleEl = document.getElementById('track-title');
+        const artistEl = document.getElementById('track-artist');
+        const waveform = document.getElementById('waveform');
+        const progressOv = document.getElementById('progress-ov');
+        const statusDot = document.getElementById('status-dot');
+        const vizContainer = document.getElementById('viz-container');
 
-        let songIndex = 0;
+        let currentIdx = 0;
         let isPlaying = false;
+        let audioCtx, analyser, sourceNode;
 
-        // --- 3. PLAYER FUNCTIONS ---
-        function loadSong(index) {
-            const song = songs[index];
-            title.innerText = song.title;
-            artist.innerText = song.artist;
-            cover.src = song.cover;
-            bgm.src = song.src; // SET SRC KE AUDIO FISIK
-            updatePlaylistUI();
+        // --- 1. BUILD WAVEFORM VISUAL (ARCHIVE STYLE) ---
+        // Generate bars fake biar keliatan canggih kayak archive
+        const barCount = 100;
+        for(let i=0; i<barCount; i++) {
+            const bar = document.createElement('div');
+            bar.classList.add('waveform-bar');
+            bar.style.height = Math.random() * 100 + '%';
+            waveform.appendChild(bar);
         }
 
-        function togglePlay() {
-            if (isPlaying) {
-                bgm.pause();
-                isPlaying = false;
-                playIcon.style.display = 'block';
-                pauseIcon.style.display = 'none';
-            } else {
-                bgm.play();
-                isPlaying = true;
-                playIcon.style.display = 'none';
-                pauseIcon.style.display = 'block';
+        // --- 2. LOAD TRACK LOGIC ---
+        function loadTrack(idx) {
+            const track = tracks[idx];
+            audio.src = track.src;
+            titleEl.innerText = track.title;
+            artistEl.innerText = track.artist;
+            cover.src = track.cover;
+            
+            // Update UI List
+            document.querySelectorAll('.track-item').forEach((el, i) => {
+                if(i === idx) el.classList.add('active');
+                else el.classList.remove('active');
+            });
+
+            if(isPlaying) {
+                audio.play().catch(e => console.log("Interaction needed"));
             }
         }
 
-        function prevSong() {
-            songIndex--;
-            if (songIndex < 0) songIndex = songs.length - 1;
-            loadSong(songIndex);
-            if(isPlaying) bgm.play();
-        }
-
-        function nextSong() {
-            songIndex++;
-            if (songIndex > songs.length - 1) songIndex = 0;
-            loadSong(songIndex);
-            if(isPlaying) bgm.play();
-        }
-
-        function updateProgress() {
-            const { duration, currentTime } = bgm;
-            if (isNaN(duration)) return;
-            const progressPercent = (currentTime / duration) * 100;
-            progressBar.style.width = `${progressPercent}%`;
-            
-            const currMin = Math.floor(currentTime / 60);
-            let currSec = Math.floor(currentTime % 60);
-            if (currSec < 10) currSec = `0${currSec}`;
-            const durMin = Math.floor(duration / 60);
-            let durSec = Math.floor(duration % 60);
-            if (durSec < 10) durSec = `0${durSec}`;
-
-            currTime.innerText = `${currMin}:${currSec}`;
-            durTime.innerText = `${durMin}:${durSec}`;
-        }
-
-        function setProgress(e) {
-            const width = this.clientWidth;
-            const clickX = e.offsetX;
-            const duration = bgm.duration;
-            bgm.currentTime = (clickX / width) * duration;
-        }
-
-        // --- 4. PLAYLIST UI ---
-        function generatePlaylist() {
-            playlistBox.innerHTML = '';
-            songs.forEach((song, index) => {
-                const item = document.createElement('div');
-                item.classList.add('playlist-item');
-                if(index === songIndex) item.classList.add('active');
+        // --- 3. STREAM ENGINE (TRICK) ---
+        function initAudioContext() {
+            if(!audioCtx) {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                audioCtx = new AudioContext();
                 
-                item.innerHTML = `
-                    <img src="${song.cover}" class="item-thumb">
-                    <div class="item-info">
-                        <div class="item-title">${song.title}</div>
-                        <div class="item-artist">${song.artist}</div>
-                    </div>
-                `;
-                item.addEventListener('click', () => {
-                    songIndex = index;
-                    loadSong(songIndex);
-                    if(!isPlaying) togglePlay(); // Auto play jika dipilih
-                });
-                playlistBox.appendChild(item);
+                // Create Source & Analyser
+                sourceNode = audioCtx.createMediaElementSource(audio);
+                analyser = audioCtx.createAnalyser();
+                
+                // Connect
+                sourceNode.connect(analyser);
+                analyser.connect(audioCtx.destination);
+                
+                analyser.fftSize = 256;
+                const bufferLength = analyser.frequencyBinCount;
+                const dataArray = new Uint8Array(bufferLength);
+
+                // VISUALIZATION LOOP (THE ENGINE KEEPS RUNNING)
+                function animate() {
+                    requestAnimationFrame(animate);
+                    
+                    if(isPlaying) {
+                        analyser.getByteFrequencyData(dataArray);
+                        
+                        // Calculate average for visual impact
+                        const sum = dataArray.reduce((a,b) => a+b);
+                        const avg = sum / dataArray.length;
+
+                        // Effect 1: Rotate speed based on volume
+                        const rotateSpeed = 2 + (avg / 50);
+                        document.querySelector('.visualizer-ring').style.animationDuration = `${11 - rotateSpeed}s`;
+
+                        // Effect 2: Glow
+                        const glowSize = 10 + (avg / 5);
+                        vizContainer.style.boxShadow = `0 0 ${glowSize}px rgba(0, 229, 255, ${avg/300})`;
+
+                        // Effect 3: Waveform bars jump
+                        const bars = document.querySelectorAll('.waveform-bar');
+                        bars.forEach((bar, i) => {
+                            // Map audio data to bars (simple visualization)
+                            if(i < dataArray.length) {
+                                const h = (dataArray[i] / 255) * 100;
+                                bar.style.height = Math.max(10, h) + '%';
+                                bar.style.background = `hsl(${180 + (avg/2)}, 100%, 50%)`;
+                            }
+                        });
+                    }
+                }
+                animate();
+            }
+        }
+
+        // --- 4. CONTROLS ---
+        playBtn.addEventListener('click', () => {
+            if(!audioCtx) initAudioContext(); // First interaction
+            
+            if(audioCtx && audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+
+            if(isPlaying) {
+                audio.pause();
+                isPlaying = false;
+                playBtn.innerText = "▶";
+                statusDot.classList.remove('active');
+            } else {
+                audio.play();
+                isPlaying = true;
+                playBtn.innerText = "||";
+                statusDot.classList.add('active');
+            }
+        });
+
+        nextBtn.addEventListener('click', () => {
+            currentIdx = (currentIdx + 1) % tracks.length;
+            loadTrack(currentIdx);
+        });
+
+        prevBtn.addEventListener('click', () => {
+            currentIdx = (currentIdx - 1 + tracks.length) % tracks.length;
+            loadTrack(currentIdx);
+        });
+
+        // Auto Next (Seamless Loop)
+        audio.addEventListener('ended', () => {
+            currentIdx = (currentIdx + 1) % tracks.length;
+            loadTrack(currentIdx);
+        });
+
+        // Progress Bar Click
+        waveform.addEventListener('click', (e) => {
+            const rect = waveform.getBoundingClientRect();
+            const pos = (e.clientX - rect.left) / rect.width;
+            if(audio.duration) {
+                audio.currentTime = pos * audio.duration;
+            }
+        });
+
+        // Update Progress
+        audio.addEventListener('timeupdate', () => {
+            if(audio.duration) {
+                const pct = (audio.currentTime / audio.duration) * 100;
+                progressOv.style.width = `${pct}%`;
+            }
+        });
+
+        // --- 5. BUILD PLAYLIST ---
+        tracks.forEach((track, idx) => {
+            const li = document.createElement('li');
+            li.classList.add('track-item');
+            li.innerHTML = `
+                <div class="track-info">
+                    <div class="track-title">${track.title}</div>
+                    <div class="track-meta">${track.artist}</div>
+                </div>
+            `;
+            li.addEventListener('click', () => {
+                currentIdx = idx;
+                loadTrack(idx);
+                if(!isPlaying) {
+                    playBtn.click();
+                }
             });
-        }
+            trackList.appendChild(li);
+        });
 
-        function updatePlaylistUI() {
-            const items = document.querySelectorAll('.playlist-item');
-            items.forEach((item, index) => {
-                if(index === songIndex) item.classList.add('active');
-                else item.classList.remove('active');
-            });
-        }
-
-        function togglePlaylist() {
-            playlistBox.classList.toggle('open');
-        }
-
-        // --- 5. EVENTS ---
-        playPauseBtn.addEventListener('click', togglePlay);
-        prevBtn.addEventListener('click', prevSong);
-        nextBtn.addEventListener('click', nextSong);
-        bgm.addEventListener('timeupdate', updateProgress);
-        bgm.addEventListener('ended', nextSong);
-        progressContainer.addEventListener('click', setProgress);
-
-        generatePlaylist();
-        loadSong(songIndex); // Load lagu pertama
-
-        // --- 6. INIT SYSTEM & AUDIO REACT (COPY DARI CONTOH) ---
-        function startExperience() {
-            // Hilangkan Splash
-            document.getElementById('play-screen').style.display = 'none';
-            document.getElementById('main-content').style.display = 'block';
-
-            // Mulai Audio
-            bgm.volume = 0.6;
-            bgm.play();
-            isPlaying = true;
-            playIcon.style.display = 'none';
-            pauseIcon.style.display = 'block';
-
-            // JALANKAN AUDIO REACT (TRIK CONTOH)
-            audioReact();
-        }
-
-        let audioCtx, analyser, dataArray;
-
-        function audioReact(){
-          // PENTING: createMediaElementSource(bgm) -> PANGGIL ID AUDIO
-          const ctx=new (window.AudioContext||window.webkitAudioContext)();
-          const src=ctx.createMediaElementSource(bgm);
-          const an=ctx.createAnalyser();
-          src.connect(an);
-          an.connect(ctx.destination);
-          an.fftSize=256;
-          const data=new Uint8Array(an.frequencyBinCount);
-
-          function anim(){
-            an.getByteFrequencyData(data);
-            const avg=data.reduce((a,b)=>a+b)/data.length;
-            const r=Math.random()*255|0;
-            const g=Math.random()*255|0;
-            const b=Math.random()*255|0;
-
-            document.getElementById('bgflash').style.background=
-              `rgba(${r},${g},${b},${Math.min(.7,avg/180)})`;
-
-            requestAnimationFrame(anim);
-          }
-          anim();
-        }
+        // Load First
+        loadTrack(0);
 
     </script>
 </body>
