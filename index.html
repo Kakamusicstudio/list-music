@@ -4,16 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-width=1.0">
     
-    <!-- Meta Tag untuk Share di WhatsApp -->
     <title>Kaka Music Game Studio Playlist</title>
     <meta property="og:title" content="Dengarkan Lagu Terbaru - Kaka Music Game Studio">
     <meta property="og:description" content="Koleksi lagu gaming terbaik dan soundtrack eksklusif. Dengerin sekarang!">
     <meta property="og:image" content="https://via.placeholder.com/600x600/000000/FFFFFF?text=Kaka+Music+Studio"> 
-    <meta property="og:type" content="music.song">
     <meta name="theme-color" content="#0f0f1a">
 
     <style>
-        /* --- RESET & BASIC SETUP --- */
+        /* --- DESAIN TIDAK DIUBAH --- */
         :root {
             --primary: #00e5ff; /* Cyan Neon */
             --secondary: #ff0055; /* Pink Neon */
@@ -27,7 +25,7 @@
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            user-select: none; /* Mencegah seleksi teks agar terasa seperti aplikasi */
+            user-select: none;
         }
 
         body {
@@ -42,7 +40,6 @@
             background: radial-gradient(circle at 50% -20%, #2a2a4a, var(--bg-dark));
         }
 
-        /* --- BACKGROUND ANIMATION --- */
         .bg-particles {
             position: absolute;
             width: 100%;
@@ -67,7 +64,6 @@
             100% { transform: translateY(-10vh) translateX(20px); opacity: 0; }
         }
 
-        /* --- MAIN CONTAINER --- */
         .player-container {
             width: 90%;
             max-width: 400px;
@@ -81,10 +77,7 @@
             position: relative;
         }
 
-        /* Header */
-        .header {
-            margin-bottom: 20px;
-        }
+        .header { margin-bottom: 20px; }
         .header h1 {
             font-size: 1.2rem;
             letter-spacing: 2px;
@@ -95,7 +88,6 @@
             font-weight: 800;
         }
 
-        /* Cover Art */
         .cover-wrapper {
             width: 100%;
             aspect-ratio: 1/1;
@@ -112,15 +104,9 @@
             object-fit: cover;
             transition: transform 0.5s ease;
         }
+        .cover-wrapper:hover .cover-img { transform: scale(1.05); }
 
-        .cover-wrapper:hover .cover-img {
-            transform: scale(1.05);
-        }
-
-        /* Song Info */
-        .song-info {
-            margin-bottom: 20px;
-        }
+        .song-info { margin-bottom: 20px; }
         .song-title {
             font-size: 1.5rem;
             font-weight: 700;
@@ -129,17 +115,9 @@
             overflow: hidden;
             text-overflow: ellipsis;
         }
-        .artist-name {
-            font-size: 0.9rem;
-            color: var(--primary);
-            margin-bottom: 2px;
-        }
-        .album-name {
-            font-size: 0.8rem;
-            color: var(--text-muted);
-        }
+        .artist-name { font-size: 0.9rem; color: var(--primary); margin-bottom: 2px; }
+        .album-name { font-size: 0.8rem; color: var(--text-muted); }
 
-        /* Progress Bar */
         .progress-container {
             width: 100%;
             height: 5px;
@@ -164,7 +142,6 @@
             margin-bottom: 20px;
         }
 
-        /* Controls */
         .controls {
             display: flex;
             justify-content: space-between;
@@ -182,11 +159,7 @@
             align-items: center;
             justify-content: center;
         }
-
-        .btn:hover {
-            color: var(--primary);
-            transform: scale(1.1);
-        }
+        .btn:hover { color: var(--primary); transform: scale(1.1); }
 
         .btn-main {
             width: 60px;
@@ -197,13 +170,8 @@
             font-size: 24px;
             color: #000;
         }
-        
-        .btn-main:hover {
-            color: #000; /* Tetap hitam karena icon play/pause */
-            box-shadow: 0 0 25px rgba(255, 0, 85, 0.6);
-        }
+        .btn-main:hover { color: #000; box-shadow: 0 0 25px rgba(255, 0, 85, 0.6); }
 
-        /* Playlist List (Hidden by default on mobile, toggleable) */
         .playlist-toggle {
             margin-top: 20px;
             font-size: 0.9rem;
@@ -219,11 +187,7 @@
             margin-top: 10px;
             border-top: 1px solid rgba(255,255,255,0.1);
         }
-        
-        .playlist-box.open {
-            max-height: 200px;
-            padding-top: 10px;
-        }
+        .playlist-box.open { max-height: 200px; padding-top: 10px; }
 
         .playlist-item {
             display: flex;
@@ -233,16 +197,11 @@
             border-radius: 8px;
             transition: background 0.2s;
         }
-        
-        .playlist-item:hover {
-            background: rgba(255,255,white:0.05);
-        }
-
+        .playlist-item:hover { background: rgba(255,255,255,0.05); }
         .playlist-item.active {
             background: rgba(0, 229, 255, 0.1);
             border-left: 3px solid var(--primary);
         }
-
         .item-thumb {
             width: 40px;
             height: 40px;
@@ -250,31 +209,23 @@
             margin-right: 10px;
             object-fit: cover;
         }
-        
-        .item-info {
-            text-align: left;
-            flex: 1;
-        }
-        
-        .item-title {
-            font-size: 0.9rem;
-            color: var(--text-main);
-        }
-        
-        .item-artist {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-        }
+        .item-info { text-align: left; flex: 1; }
+        .item-title { font-size: 0.9rem; color: var(--text-main); }
+        .item-artist { font-size: 0.75rem; color: var(--text-muted); }
 
-        /* SVG Icons */
-        svg {
-            width: 24px;
-            height: 24px;
-            fill: currentColor;
-        }
-        .btn-main svg {
-            width: 28px;
-            height: 28px;
+        svg { width: 24px; height: 24px; fill: currentColor; }
+        .btn-main svg { width: 28px; height: 28px; }
+
+        /* --- STYLE KHUSUS TRIK AUTO PLAY --- */
+        #auto-play-frame {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 1px;
+            height: 1px;
+            opacity: 0.01; /* Hampir tidak terlihat */
+            pointer-events: none; /* Tidak bisa diklik user */
+            z-index: -999;
         }
 
     </style>
@@ -284,24 +235,24 @@
     <!-- Background Particles -->
     <div class="bg-particles" id="particles"></div>
 
+    <!-- Iframe Tersembunyi (TRIK AUTO PLAY) -->
+    <iframe id="auto-play-frame" src="" allow="autoplay"></iframe>
+
     <div class="player-container">
         <div class="header">
             <h1>Kaka Studio</h1>
         </div>
 
-        <!-- Cover Image -->
         <div class="cover-wrapper">
             <img src="" alt="Album Art" class="cover-img" id="cover">
         </div>
 
-        <!-- Song Info -->
         <div class="song-info">
             <div class="song-title" id="title">Loading...</div>
             <div class="artist-name" id="artist">Artist</div>
             <div class="album-name" id="album">Album</div>
         </div>
 
-        <!-- Progress Bar -->
         <div class="progress-container" id="progress-container">
             <div class="progress-bar" id="progress"></div>
         </div>
@@ -310,46 +261,34 @@
             <span id="dur-time">0:00</span>
         </div>
 
-        <!-- Controls -->
         <div class="controls">
-            <!-- Prev -->
             <button class="btn" id="prev">
                 <svg viewBox="0 0 24 24"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>
             </button>
 
-            <!-- Play/Pause -->
             <button class="btn btn-main" id="play">
-                <!-- Play Icon -->
                 <svg id="play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-                <!-- Pause Icon (Hidden default) -->
                 <svg id="pause-icon" viewBox="0 0 24 24" style="display:none"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
             </button>
 
-            <!-- Next -->
             <button class="btn" id="next">
                 <svg viewBox="0 0 24 24"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
             </button>
         </div>
 
-        <!-- Playlist Toggle -->
         <div class="playlist-toggle" onclick="togglePlaylist()">Lihat Daftar Lagu ▼</div>
-        <div class="playlist-box" id="playlist-box">
-            <!-- Items injected by JS -->
-        </div>
+        <div class="playlist-box" id="playlist-box"></div>
     </div>
 
     <script>
         // --- KONFIGURASI LAGU ---
-        // Ganti URL di bawah ini dengan link MP3 dan Foto Kamu
-        // Contoh untuk GitHub: "./lagu1.mp3" atau link eksternal (pastikan CORS diizinkan)
-        
         const songs = [
             {
                 title: "Battle of the Ancients",
                 artist: "Kaka Composer",
                 album: "Epic Soundtrack Vol. 1",
-                cover: "https://picsum.photos/seed/game1/300/300", // Ganti dengan foto lagu kamu
-                src: "welcome-robot.mp3" // Contoh link mp3 online
+                cover: "https://picsum.photos/seed/game1/300/300",
+                src: "welcome-robot.mp3" 
             },
             {
                 title: "Neon City Night",
@@ -367,36 +306,26 @@
             }
         ];
 
-        // --- DOM ELEMENTS ---
         const cover = document.getElementById('cover');
         const title = document.getElementById('title');
         const artist = document.getElementById('artist');
         const album = document.getElementById('album');
-        
         const progressContainer = document.getElementById('progress-container');
         const progressBar = document.getElementById('progress');
         const currTime = document.getElementById('curr-time');
         const durTime = document.getElementById('dur-time');
-
         const playBtn = document.getElementById('play');
         const prevBtn = document.getElementById('prev');
         const nextBtn = document.getElementById('next');
-        
         const playIcon = document.getElementById('play-icon');
         const pauseIcon = document.getElementById('pause-icon');
-        
         const playlistBox = document.getElementById('playlist-box');
 
         let songIndex = 0;
         let isPlaying = false;
-
-        // Audio Object
         const audio = new Audio();
         
-        // --- INIT ---
         loadSong(songs[songIndex]);
-
-        // --- FUNCTIONS ---
 
         function loadSong(song) {
             title.innerText = song.title;
@@ -409,10 +338,10 @@
 
         function playSong() {
             isPlaying = true;
-            audio.play().catch(e => console.log("Autoplay blocked, interaction needed first"));
+            audio.play().catch(e => console.log("Play error:", e));
             playIcon.style.display = 'none';
             pauseIcon.style.display = 'block';
-            cover.style.transform = "scale(1.05)"; // Efek membesar
+            cover.style.transform = "scale(1.05)";
         }
 
         function pauseSong() {
@@ -425,18 +354,14 @@
 
         function prevSong() {
             songIndex--;
-            if (songIndex < 0) {
-                songIndex = songs.length - 1;
-            }
+            if (songIndex < 0) songIndex = songs.length - 1;
             loadSong(songs[songIndex]);
             if(isPlaying) playSong();
         }
 
         function nextSong() {
             songIndex++;
-            if (songIndex > songs.length - 1) {
-                songIndex = 0;
-            }
+            if (songIndex > songs.length - 1) songIndex = 0;
             loadSong(songs[songIndex]);
             if(isPlaying) playSong();
         }
@@ -447,11 +372,9 @@
             const progressPercent = (currentTime / duration) * 100;
             progressBar.style.width = `${progressPercent}%`;
 
-            // Time formatting
             const currentMin = Math.floor(currentTime / 60);
             let currentSec = Math.floor(currentTime % 60);
             if (currentSec < 10) currentSec = `0${currentSec}`;
-            
             const durationMin = Math.floor(duration / 60);
             let durationSec = Math.floor(duration % 60);
             if (durationSec < 10) durationSec = `0${durationSec}`;
@@ -467,7 +390,6 @@
             audio.currentTime = (clickX / width) * duration;
         }
 
-        // Generate Playlist UI
         function generatePlaylist() {
             playlistBox.innerHTML = '';
             songs.forEach((song, index) => {
@@ -482,13 +404,11 @@
                         <div class="item-artist">${song.artist}</div>
                     </div>
                 `;
-                
                 item.addEventListener('click', () => {
                     songIndex = index;
                     loadSong(songs[songIndex]);
                     playSong();
                 });
-                
                 playlistBox.appendChild(item);
             });
         }
@@ -505,13 +425,9 @@
             playlistBox.classList.toggle('open');
         }
 
-        // --- EVENTS ---
         playBtn.addEventListener('click', () => {
-            if (isPlaying) {
-                pauseSong();
-            } else {
-                playSong();
-            }
+            if (isPlaying) pauseSong();
+            else playSong();
         });
 
         prevBtn.addEventListener('click', prevSong);
@@ -519,10 +435,8 @@
 
         audio.addEventListener('timeupdate', updateProgress);
         audio.addEventListener('ended', nextSong);
-        
         progressContainer.addEventListener('click', setProgress);
 
-        // --- BACKGROUND PARTICLES GENERATOR ---
         const particlesContainer = document.getElementById('particles');
         for (let i = 0; i < 20; i++) {
             const p = document.createElement('div');
@@ -533,21 +447,27 @@
             particlesContainer.appendChild(p);
         }
 
-        // Jalankan playlist
         generatePlaylist();
-        
-        // --- AUTO PLAY LOGIC ---
+
+        // --- LOGIKA AUTO PLAY PAKSA (KHUSUS) ---
         window.addEventListener('load', () => {
-             // Coba langsung memainkan lagu saat halaman dimuat
-             audio.play().then(() => {
-                 isPlaying = true;
-                 playIcon.style.display = 'none';
-                 pauseIcon.style.display = 'block';
-                 cover.style.transform = "scale(1.05)";
-                 console.log("Auto Play Berhasil!");
-             }).catch(error => {
-                 console.log("Autoplay diblokir browser, perlu interaksi user.");
-             });
+            const iframe = document.getElementById('auto-play-frame');
+            // Set src iframe ke lagu. Ini akan memaksa browser mengizinkan audio.
+            // Trik ini mengizinkan konteks audio di tab utama.
+            iframe.src = "welcome-robot.mp3";
+
+            setTimeout(() => {
+                // Coba putar audio player utama setelah iframe dimuat
+                audio.play().then(() => {
+                    isPlaying = true;
+                    playIcon.style.display = 'none';
+                    pauseIcon.style.display = 'block';
+                    cover.style.transform = "scale(1.05)";
+                    console.log("Auto Play Berhasil via Iframe Hack!");
+                }).catch(e => {
+                    console.log("Masih diblokir, user harus klik tombol play.");
+                });
+            }, 500); // Delay sedikit agar iframe selesai load
         });
 
     </script>
