@@ -34,6 +34,23 @@
             overflow: hidden;
         }
 
+        /* SPLASH SCREEN (UNTUK AUTOPLAY ATTEMPT) */
+        #splash {
+            position: fixed; inset: 0;
+            background: #000;
+            z-index: 9999;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            transition: opacity 0.5s;
+        }
+        .splash-text {
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--accent);
+            margin-bottom: 20px;
+            animation: blink 1s infinite;
+        }
+        @keyframes blink { 50% { opacity: 0.5; } }
+
         /* HEADER */
         header {
             padding: 15px 20px;
@@ -225,6 +242,12 @@
 </head>
 <body>
 
+    <!-- SPLASH SCREEN: AUTOPLAY ATTEMPT -->
+    <div id="splash">
+        <div class="splash-text">INITIALIZING AUDIO STREAM...</div>
+        <button class="btn-play" id="start-btn" style="display:none;">TAP TO START</button>
+    </div>
+
     <header>
         <div class="brand">KAKA MUSIC ARCHIVE // V.1.0</div>
         <div class="status-dot" id="status-dot"></div>
@@ -292,13 +315,14 @@
         const progressOv = document.getElementById('progress-ov');
         const statusDot = document.getElementById('status-dot');
         const vizContainer = document.getElementById('viz-container');
+        const splash = document.getElementById('splash');
+        const startBtn = document.getElementById('start-btn');
 
         let currentIdx = 0;
         let isPlaying = false;
         let audioCtx, analyser, sourceNode;
 
         // --- 1. BUILD WAVEFORM VISUAL (ARCHIVE STYLE) ---
-        // Generate bars fake biar keliatan canggih kayak archive
         const barCount = 100;
         for(let i=0; i<barCount; i++) {
             const bar = document.createElement('div');
@@ -344,29 +368,24 @@
                 const bufferLength = analyser.frequencyBinCount;
                 const dataArray = new Uint8Array(bufferLength);
 
-                // VISUALIZATION LOOP (THE ENGINE KEEPS RUNNING)
+                // VISUALIZATION LOOP
                 function animate() {
                     requestAnimationFrame(animate);
                     
                     if(isPlaying) {
                         analyser.getByteFrequencyData(dataArray);
                         
-                        // Calculate average for visual impact
                         const sum = dataArray.reduce((a,b) => a+b);
                         const avg = sum / dataArray.length;
 
-                        // Effect 1: Rotate speed based on volume
                         const rotateSpeed = 2 + (avg / 50);
                         document.querySelector('.visualizer-ring').style.animationDuration = `${11 - rotateSpeed}s`;
 
-                        // Effect 2: Glow
                         const glowSize = 10 + (avg / 5);
                         vizContainer.style.boxShadow = `0 0 ${glowSize}px rgba(0, 229, 255, ${avg/300})`;
 
-                        // Effect 3: Waveform bars jump
                         const bars = document.querySelectorAll('.waveform-bar');
                         bars.forEach((bar, i) => {
-                            // Map audio data to bars (simple visualization)
                             if(i < dataArray.length) {
                                 const h = (dataArray[i] / 255) * 100;
                                 bar.style.height = Math.max(10, h) + '%';
@@ -381,7 +400,7 @@
 
         // --- 4. CONTROLS ---
         playBtn.addEventListener('click', () => {
-            if(!audioCtx) initAudioContext(); // First interaction
+            if(!audioCtx) initAudioContext(); 
             
             if(audioCtx && audioCtx.state === 'suspended') {
                 audioCtx.resume();
@@ -410,7 +429,7 @@
             loadTrack(currentIdx);
         });
 
-        // Auto Next (Seamless Loop)
+        // Auto Next
         audio.addEventListener('ended', () => {
             currentIdx = (currentIdx + 1) % tracks.length;
             loadTrack(currentIdx);
@@ -453,8 +472,45 @@
             trackList.appendChild(li);
         });
 
-        // Load First
         loadTrack(0);
+
+        // --- 6. AUTOPLAY ATTEMPT (SYSTEM) ---
+        // Coba autoplay otomatis pas load
+        window.addEventListener('load', async () => {
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            
+            // Coba Play Audio
+            try {
+                await audio.play();
+                
+                // Kalau sukses:
+                isPlaying = true;
+                playBtn.innerText = "||";
+                statusDot.classList.add('active');
+                initAudioContext();
+                
+                // Hilangkan Splash
+                splash.style.opacity = '0';
+                setTimeout(() => splash.style.display = 'none', 500);
+
+            } catch (err) {
+                // Kalau GAGAL (Diblokir Browser):
+                console.log("Autoplay blocked, showing start button.");
+                document.querySelector('.splash-text').style.display = 'none';
+                startBtn.style.display = 'block';
+                
+                // Fallback ke manual start
+                startBtn.addEventListener('click', () => {
+                    initAudioContext();
+                    audio.play();
+                    isPlaying = true;
+                    playBtn.innerText = "||";
+                    statusDot.classList.add('active');
+                    splash.style.opacity = '0';
+                    setTimeout(() => splash.style.display = 'none', 500);
+                });
+            }
+        });
 
     </script>
 </body>
