@@ -2,306 +2,234 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-width=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
-    <title>Kaka Music Studio - Cyberpunk Edition</title>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
-    <meta property="og:title" content="Kaka Music Game Studio - Cyberpunk">
-    <meta property="og:description" content="Dengarkan lagu dengan visual terbaik.">
+    <title>Kaka Music Studio - Optimized</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <meta property="og:title" content="Kaka Music Game Studio">
+    <meta property="og:description" content="Dengarkan soundtrack terbaik kami.">
     <meta property="og:image" content="https://via.placeholder.com/600x600/000000/00e5ff?text=Kaka+Music"> 
     <meta name="theme-color" content="#000000">
 
     <style>
-        /* --- RESET & BASE --- */
+        /* --- RESET & SETUP (RINGAN) --- */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
         body {
-            font-family: 'Share Tech Mono', monospace; /* Font Coding */
+            font-family: 'Poppins', sans-serif;
             background-color: #050505;
             color: #fff;
             height: 100vh;
-            overflow: hidden;
             display: flex;
             justify-content: center;
             align-items: center;
+            overflow: hidden;
+            /* Hanya gradasi sederhana, tanpa animasi berat */
+            background: radial-gradient(circle at center, #1a1a2e, #000);
         }
 
-        /* --- BACKGROUND EFFECTS (LAYERS) --- */
+        /* --- AUDIO REACT LAYERS (RINGAN) --- */
         
-        /* 1. Moving Neon Grid (Lantai) */
-        #grid-bg {
-            position: fixed;
-            bottom: 0; left: 0; width: 100%; height: 50%;
-            background: 
-                linear-gradient(transparent 0%, #000 100%),
-                linear-gradient(0deg, rgba(0,255,255,0.3) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(0,255,255,0.3) 1px, transparent 1px);
-            background-size: 100% 100%, 40px 40px, 40px 40px;
-            transform: perspective(500px) rotateX(60deg) translateY(100px) translateZ(-200px);
-            animation: gridMove 20s linear infinite;
-            z-index: -3;
-            opacity: 0.4;
-        }
-        @keyframes gridMove {
-            0% { background-position: 0 0, 0 0, 0 0; }
-            100% { background-position: 0 0, 0 40px, 40px 0; }
-        }
-
-        /* 2. Audio React Layer (Flash Berwarna) */
+        /* 1. Flash Effect (Berdenyut) - SATU-SATUNYA ANIMASI BERAT */
         #bgflash {
             position: fixed;
             inset: 0;
-            z-index: -2;
             pointer-events: none;
-            mix-blend-mode: screen; /* Mode campur warna */
-        }
-
-        /* 3. CRT Scanlines (Garis TV) */
-        .scanlines {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
-            background-size: 100% 2px, 3px 100%;
-            z-index: 999;
-            pointer-events: none;
-        }
-
-        /* 4. Floating Particles */
-        .particle {
-            position: fixed;
-            width: 4px; height: 4px;
-            background: #fff;
-            border-radius: 50%;
-            box-shadow: 0 0 10px #0ff;
             z-index: -1;
-            animation: floatUp 5s linear infinite;
-        }
-        @keyframes floatUp {
-            0% { transform: translateY(100vh) scale(0); opacity: 0; }
-            50% { opacity: 1; }
-            100% { transform: translateY(-10vh) scale(1); opacity: 0; }
+            background: #050505;
+            /* Gunakan opacity yang diubah JS, bukan warna full RGB biar ringan */
         }
 
         /* --- SPLASH SCREEN --- */
         #splash-screen {
             position: fixed;
             inset: 0;
-            background: #000;
+            background: #050505;
             z-index: 10000;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            transition: opacity 0.8s ease;
+            text-align: center;
         }
 
         .splash-logo {
             font-family: 'Orbitron', sans-serif;
-            font-size: 3.5rem;
-            font-weight: 900;
-            color: #0ff;
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #00e5ff;
             text-transform: uppercase;
-            letter-spacing: 5px;
-            text-shadow: 
-                2px 2px 0px #f0f, 
-                -2px -2px 0px #0ff;
-            animation: glitch 1s infinite alternate;
-        }
-        @keyframes glitch {
-            0% { text-shadow: 2px 2px 0px #f0f, -2px -2px 0px #0ff; transform: skew(0deg); }
-            20% { text-shadow: 2px -2px 0px #f0f, -2px 2px 0px #0ff; transform: skew(-10deg); }
-            40% { text-shadow: -2px 2px 0px #f0f, 2px -2px 0px #0ff; transform: skew(10deg); }
-            60% { text-shadow: -2px -2px 0px #f0f, 2px 2px 0px #0ff; transform: skew(0deg); }
+            letter-spacing: 3px;
+            margin-bottom: 20px;
+            text-shadow: 0 0 15px rgba(0, 229, 255, 0.5);
         }
 
         .btn-start {
-            margin-top: 40px;
             background: transparent;
-            color: #0ff;
-            border: 2px solid #0ff;
-            padding: 15px 40px;
-            font-size: 1.2rem;
+            border: 2px solid #ff0055;
+            color: #fff;
+            padding: 12px 30px;
+            font-size: 1rem;
             font-family: 'Orbitron', sans-serif;
-            text-transform: uppercase;
             cursor: pointer;
-            position: relative;
-            overflow: hidden;
+            border-radius: 50px;
+            box-shadow: 0 0 15px rgba(255, 0, 85, 0.4);
             transition: 0.3s;
-            box-shadow: 0 0 15px #0ff;
         }
         .btn-start:hover {
-            background: #0ff;
-            color: #000;
-            box-shadow: 0 0 40px #0ff, 0 0 80px #f0f;
+            background: #ff0055;
+            box-shadow: 0 0 25px rgba(255, 0, 85, 0.8);
         }
 
-        /* --- PLAYER CARD (HOLOGRAPHIC) --- */
+        /* --- PLAYER CARD --- */
+        :root {
+            --primary: #00e5ff;
+            --secondary: #ff0055;
+        }
+
         .player-container {
             width: 90%;
-            max-width: 400px;
-            background: rgba(10, 10, 20, 0.7);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(0, 255, 255, 0.3);
-            border-radius: 10px;
+            max-width: 380px;
+            background: rgba(20, 15, 25, 0.9);
+            backdrop-filter: blur(10px); /* Ringan */
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
             padding: 25px;
             text-align: center;
             position: relative;
-            box-shadow: 0 0 20px rgba(0, 255, 255, 0.1);
-            transition: all 0.1s; /* Cepat untuk audio react */
+            /* Efek Glow akan diatur JS biar hemat baterai */
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            transition: box-shadow 0.1s;
         }
 
-        /* Dekorasi Sudut Player */
-        .player-container::before, .player-container::after {
-            content: ''; position: absolute; width: 20px; height: 20px;
-            border: 2px solid #f0f; transition: 0.3s;
-        }
-        .player-container::before { top: -2px; left: -2px; border-right: none; border-bottom: none; }
-        .player-container::after { bottom: -2px; right: -2px; border-left: none; border-top: none; }
-
+        .header { margin-bottom: 15px; }
         .header h1 {
             font-family: 'Orbitron', sans-serif;
-            font-size: 1.2rem;
+            font-size: 1.1rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
             color: #fff;
-            letter-spacing: 4px;
-            margin-bottom: 20px;
-            text-shadow: 0 0 10px #f0f;
         }
 
-        /* Cover Art Holographic */
         .cover-wrapper {
-            position: relative;
             width: 100%;
             aspect-ratio: 1/1;
-            margin-bottom: 20px;
-        }
-        .cover-wrapper img {
-            width: 100%; height: 100%;
-            object-fit: cover;
-            border-radius: 5px;
-            border: 1px solid rgba(255,255,255,0.2);
-        }
-        /* Efek Overlay di Cover */
-        .cover-wrapper::after {
-            content: ''; position: absolute; inset: 0;
-            background: linear-gradient(135deg, rgba(255,0,255,0.2), rgba(0,255,255,0.2));
-            mix-blend-mode: overlay;
-            pointer-events: none;
-        }
-
-        .song-title {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 1.3rem;
-            color: #fff;
-            margin-bottom: 5px;
-            text-transform: uppercase;
-        }
-        .artist-name { color: #0ff; font-size: 0.9rem; letter-spacing: 1px; }
-        .album-name { color: #f0f; font-size: 0.8rem; margin-bottom: 15px; }
-
-        /* Progress Bar Cyber */
-        .progress-container {
-            width: 100%; height: 6px;
-            background: #111;
-            border-radius: 3px;
-            margin-bottom: 10px;
-            cursor: pointer;
+            border-radius: 10px;
             overflow: hidden;
-            border: 1px solid #333;
+            margin-bottom: 20px;
+            position: relative;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+        }
+
+        .cover-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .song-info { margin-bottom: 15px; }
+        .song-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+            color: #fff;
+        }
+        .artist-name { font-size: 0.9rem; color: var(--primary); }
+        .album-name { font-size: 0.8rem; color: #666; margin-bottom: 15px; }
+
+        .progress-container {
+            width: 100%;
+            height: 5px;
+            background: #333;
+            border-radius: 5px;
+            margin-bottom: 8px;
+            cursor: pointer;
         }
         .progress-bar {
             height: 100%;
-            background: linear-gradient(90deg, #f0f, #0ff);
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            border-radius: 5px;
             width: 0%;
-            box-shadow: 0 0 10px #0ff;
         }
-
         .time-stamps {
             display: flex; justify-content: space-between;
             font-size: 0.75rem; color: #888;
             margin-bottom: 20px;
-            font-family: 'Share Tech Mono', monospace;
+            font-family: 'Orbitron', sans-serif;
         }
 
-        /* Controls */
-        .controls { display: flex; justify-content: space-between; align-items: center; padding: 0 10px; }
-        
-        .btn {
-            background: none; border: none;
-            color: #0ff; cursor: pointer;
-            transition: 0.3s; filter: drop-shadow(0 0 5px #0ff);
+        .controls {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 0 20px;
         }
-        .btn:hover { color: #fff; filter: drop-shadow(0 0 15px #fff); transform: scale(1.2); }
+
+        .btn {
+            background: none; border: none; color: #fff;
+            cursor: pointer; transition: 0.2s;
+        }
+        .btn:hover { color: var(--primary); transform: scale(1.1); }
 
         .btn-main {
-            width: 70px; height: 70px;
+            width: 60px; height: 60px;
             border-radius: 50%;
-            background: rgba(0,0,0,0.5);
-            border: 2px solid #f0f;
-            color: #fff;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            display: flex; align-items: center; justify-content: center;
             font-size: 24px;
-            box-shadow: 0 0 15px #f0f;
+            color: #000;
+            box-shadow: 0 0 15px rgba(0, 229, 255, 0.3);
         }
-        .btn-main:hover {
-            background: #f0f; color: #000;
-            box-shadow: 0 0 30px #f0f;
-        }
+        .btn-main:hover { box-shadow: 0 0 25px rgba(255, 0, 85, 0.6); }
 
         .playlist-toggle {
-            margin-top: 20px; color: #f0f;
-            font-size: 0.8rem; text-transform: uppercase;
-            cursor: pointer; letter-spacing: 2px;
+            margin-top: 15px; font-size: 0.85rem;
+            color: var(--secondary); cursor: pointer; text-decoration: underline;
         }
-        .playlist-toggle:hover { color: #fff; text-shadow: 0 0 10px #f0f; }
 
         .playlist-box {
             max-height: 0; overflow-y: auto;
-            border-top: 1px solid rgba(255,0,255,0.3);
+            border-top: 1px solid rgba(255,255,255,0.1);
             transition: max-height 0.3s;
         }
         .playlist-box.open { max-height: 200px; padding-top: 10px; }
 
         .playlist-item {
             display: flex; align-items: center; padding: 10px;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-            cursor: pointer;
+            cursor: pointer; border-radius: 5px;
         }
-        .playlist-item:hover { background: rgba(0,255,255,0.1); }
-        .playlist-item.active { border-left: 3px solid #f0f; background: rgba(255,0,255,0.1); }
+        .playlist-item:hover { background: rgba(255,255,255,0.05); }
+        .playlist-item.active { border-left: 3px solid var(--primary); background: rgba(0, 229, 255, 0.05); }
         .item-thumb { width: 40px; height: 40px; margin-right: 10px; object-fit: cover; border-radius: 4px; }
         .item-info { text-align: left; flex: 1; }
         .item-title { font-size: 0.9rem; color: #fff; }
-        .item-artist { font-size: 0.75rem; color: #0ff; }
-
-        body.splash-active .player-container { display: none; }
+        .item-artist { font-size: 0.75rem; color: #888; }
 
         svg { width: 24px; height: 24px; fill: currentColor; }
         .btn-main svg { width: 28px; height: 28px; }
+
+        body.splash-active .player-container { display: none; }
 
     </style>
 </head>
 <body class="splash-active">
 
-    <!-- BACKGROUND LAYERS -->
-    <div id="grid-bg"></div>
+    <!-- AUDIO REACT LAYER -->
     <div id="bgflash"></div>
-    <div class="scanlines"></div>
-    <div id="particles-container"></div>
 
     <!-- SPLASH SCREEN -->
     <div id="splash-screen">
         <div class="splash-logo">KAKA STUDIO</div>
-        <div style="color:#f0f; margin-top:10px; font-family:'Share Tech Mono'">SYSTEM INITIATED...</div>
-        <button class="btn-start" onclick="startExperience()">INITIALIZE ▶</button>
+        <div style="color:#888; margin-bottom:20px; font-size:0.9rem;">AUDIO PLAYER OPTIMIZED</div>
+        <button class="btn-start" onclick="startExperience()">START SYSTEM ▶</button>
     </div>
 
     <!-- PLAYER CONTAINER -->
     <div class="player-container">
         <div class="header">
-            <h1>CYBER PLAYER v2.0</h1>
+            <h1>Kaka Studio</h1>
         </div>
 
         <div class="cover-wrapper">
-            <img src="" alt="Cover" class="cover-img" id="cover">
+            <img src="" alt="Album Art" class="cover-img" id="cover">
         </div>
 
         <div class="song-info">
@@ -333,37 +261,36 @@
             </button>
         </div>
 
-        <div class="playlist-toggle" onclick="togglePlaylist()">ACCESS DATA ►</div>
+        <div class="playlist-toggle" onclick="togglePlaylist()">SHOW PLAYLIST ▼</div>
         <div class="playlist-box" id="playlist-box"></div>
     </div>
 
     <script>
-        // --- SONG DATA ---
+        // --- KONFIGURASI LAGU ---
         const songs = [
             {
-                title: "Neon Tokyo Drift",
-                artist: "Kaka Synth",
-                album: "Future City",
-                cover: "https://picsum.photos/seed/cyber1/300/300",
+                title: "Welcome Robot",
+                artist: "Kaka Composer",
+                album: "Game Soundtrack Vol. 1",
+                cover: "https://picsum.photos/seed/kaka1/300/300",
                 src: "welcome-robot.mp3" 
             },
             {
-                title: "Cyber Rage",
-                artist: "Glitch Mob",
-                album: "System Override",
-                cover: "https://picsum.photos/seed/cyber2/300/300",
+                title: "Neon City Night",
+                artist: "Cyber Band",
+                album: "Synthwave Collection",
+                cover: "https://picsum.photos/seed/kaka2/300/300",
                 src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3"
             },
             {
-                title: "Night City Rain",
-                artist: "Neural Net",
-                album: "AI Dreams",
-                cover: "https://picsum.photos/seed/cyber3/300/300",
+                title: "Puzzle Theme",
+                artist: "Studio Orchestra",
+                album: "Casual Games",
+                cover: "https://picsum.photos/seed/kaka3/300/300",
                 src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3"
             }
         ];
 
-        // --- DOM ELEMENTS ---
         const cover = document.getElementById('cover');
         const title = document.getElementById('title');
         const artist = document.getElementById('artist');
@@ -379,7 +306,6 @@
         const pauseIcon = document.getElementById('pause-icon');
         const playlistBox = document.getElementById('playlist-box');
         const bgflash = document.getElementById('bgflash');
-        const particlesContainer = document.getElementById('particles-container');
 
         let songIndex = 0;
         let isPlaying = false;
@@ -387,7 +313,7 @@
         
         loadSong(songs[songIndex]);
 
-        // --- PLAYER LOGIC ---
+        // --- LOGIC PLAYER ---
         function loadSong(song) {
             title.innerText = song.title;
             artist.innerText = song.artist;
@@ -399,7 +325,7 @@
 
         function playSong() {
             isPlaying = true;
-            audio.play().catch(e => console.log(e));
+            audio.play().catch(e => console.log("Play error:", e));
             playIcon.style.display = 'none';
             pauseIcon.style.display = 'block';
         }
@@ -493,18 +419,7 @@
 
         generatePlaylist();
 
-        // --- PARTICLES GENERATOR ---
-        for(let i=0; i<30; i++){
-            const p = document.createElement('div');
-            p.classList.add('particle');
-            p.style.left = Math.random() * 100 + '%';
-            p.style.animationDuration = (Math.random() * 5 + 3) + 's';
-            p.style.animationDelay = Math.random() * 2 + 's';
-            p.style.background = Math.random() > 0.5 ? '#0ff' : '#f0f';
-            particlesContainer.appendChild(p);
-        }
-
-        // --- CYBER AUDIO REACT ENGINE ---
+        // --- AUDIO REACT ENGINE (RINGAN & EFEKTIF) ---
         let audioCtx, analyser, dataArray;
 
         function startAudioReact() {
@@ -516,54 +431,52 @@
             src.connect(analyser);
             analyser.connect(audioCtx.destination);
             
-            analyser.fftSize = 512;
+            analyser.fftSize = 256; // Cukup kecil untuk performa
             const bufferLength = analyser.frequencyBinCount;
             dataArray = new Uint8Array(bufferLength);
 
-            animateCyber();
+            animate();
         }
 
-        function animateCyber() {
-            requestAnimationFrame(animateCyber);
+        function animate() {
+            requestAnimationFrame(animate);
 
             if (!isPlaying) {
-                bgflash.style.backgroundColor = "transparent";
-                document.querySelector('.player-container').style.boxShadow = "0 0 20px rgba(0, 255, 255, 0.1)";
+                // Jika pause, matikan lampu hemat baterai
+                bgflash.style.backgroundColor = "#050505";
+                document.querySelector('.player-container').style.boxShadow = "0 10px 30px rgba(0,0,0,0.5)";
                 return;
             }
 
+            // Ambil data frekuensi audio
             analyser.getByteFrequencyData(dataArray);
 
-            // Hitung energi bass (frekuensi rendah) untuk efek ledakan
-            let bass = 0;
-            for(let i = 0; i < 20; i++) { bass += dataArray[i]; }
-            bass = bass / 20; // Rata-rata bass
-
-            // --- EFFECT 1: BG FLASH COLORFUL ---
-            // Gunakan HSL untuk rotasi warna
-            // Hue berubah berdasarkan waktu, Lightness berdasarkan Bass
-            const hue = (Date.now() / 20) % 360; // Warna berputar
-            const light = Math.min(50, bass / 5); // Kecerahan mengikuti musik
-            const alpha = Math.min(0.4, bass / 100); // Transparansi
-
-            bgflash.style.backgroundColor = `hsla(${hue}, 100%, 50%, ${alpha})`;
-
-            // --- EFFECT 2: PLAYER BOX GLOW ---
-            // Cahaya di box pemutar ikut denyut bass
-            const glowSize = 20 + (bass * 1.5);
-            const glowColor = `hsla(${hue + 180}, 100%, 50%, 0.8)`; // Warna komplementer
-            document.querySelector('.player-container').style.boxShadow = 
-                `0 0 ${glowSize}px ${glowColor}, inset 0 0 ${glowSize/2}px rgba(255,255,255,0.2)`;
-                
-            // --- EFFECT 3: TITLE GLITCH TRIGGER ---
-            // Jika bass tinggi, title sedikit bergetar
-            if(bass > 200) {
-                const jitterX = Math.random() * 4 - 2;
-                const jitterY = Math.random() * 4 - 2;
-                document.querySelector('.song-title').style.transform = `translate(${jitterX}px, ${jitterY}px)`;
-            } else {
-                document.querySelector('.song-title').style.transform = `translate(0,0)`;
+            // Hitung rata-rata volume (energi lagu)
+            let sum = 0;
+            // Kita hanya ambil frekuensi rendah (Bass) agar lebih responsif terhadap beat
+            for(let i = 0; i < 50; i++) {
+                sum += dataArray[i];
             }
+            const average = sum / 50;
+
+            // --- VISUAL 1: BACKGROUND FLASH ---
+            // Gunakan opacity transparan di atas background hitam
+            // Warna Cyan/Biru ke Ungu
+            const opacity = Math.min(0.4, average / 255);
+            
+            // Ubah warna halus dari Biru ke Ungu berdasarkan volume
+            // R=0, G=variable, B=variable
+            const gVal = 20 + (average / 2); 
+            const bVal = 50 + average;
+            
+            bgflash.style.backgroundColor = `rgba(0, ${gVal}, ${bVal}, ${opacity})`;
+
+            // --- VISUAL 2: BOX GLOW ---
+            // Box player ikut berdenyut
+            const glowSize = 10 + (average / 5);
+            const glowColor = `rgba(0, 229, 255, ${Math.min(0.5, average/150)})`;
+            document.querySelector('.player-container').style.boxShadow = 
+                `0 0 ${glowSize}px ${glowColor}, inset 0 0 10px rgba(255,255,255,0.1)`;
         }
 
         function startExperience() {
