@@ -1,229 +1,548 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Kaka Music Studio</title>
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      background: linear-gradient(135deg, #0a0a1a, #1a1a3a, #0d0d2b);
-      color: white;
-      height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      font-family: 'Segoe UI', system-ui, sans-serif;
-      overflow: hidden;
-      position: relative;
-    }
-    .studio {
-      text-align: center;
-      z-index: 10;
-      padding: 20px;
-    }
-    .name {
-      font-size: 2.8rem;
-      font-weight: 800;
-      background: linear-gradient(to right, #ff8a00, #da1b60, #6a11cb, #2575fc);
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-      text-shadow: 0 0 15px rgba(106, 17, 203, 0.7);
-      margin-bottom: 15px;
-      letter-spacing: -0.5px;
-    }
-    .subtitle {
-      font-size: 1.1rem;
-      color: rgba(255,255,255,0.8);
-      letter-spacing: 2px;
-      margin-top: 5px;
-      text-transform: uppercase;
-    }
-    .robot {
-      width: 200px;
-      height: 200px;
-      position: relative;
-      margin: 25px auto;
-      animation: bounce 2s ease-in-out infinite;
-    }
-    .head {
-      width: 160px;
-      height: 160px;
-      background: linear-gradient(145deg, #2a2a4a, #1a1a3a);
-      border-radius: 24px;
-      border: 6px solid #4a4a7a;
-      position: absolute;
-      top: 0;
-      left: 50%;
-      transform: translateX(-50%);
-      box-shadow: 0 0 25px rgba(74,74,122,0.8);
-    }
-    .antenna {
-      position: absolute;
-      top: -25px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 6px;
-      height: 30px;
-      background: linear-gradient(to top, #4a4a7a, #6a11cb);
-      border-radius: 4px;
-    }
-    .antenna-tip {
-      position: absolute;
-      top: -40px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 16px;
-      height: 16px;
-      background: #ff3d7f;
-      border-radius: 50%;
-      box-shadow: 0 0 15px #ff3d7f;
-      animation: pulse 1.5s infinite;
-    }
-    .eye {
-      position: absolute;
-      width: 35px;
-      height: 35px;
-      background: #00ffcc;
-      border-radius: 50%;
-      box-shadow: 0 0 15px #00ffcc;
-      top: 55px;
-    }
-    .eye.left { left: 30px; }
-    .eye.right { right: 30px; }
-    .mouth {
-      position: absolute;
-      bottom: 30px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 65px;
-      height: 20px;
-      background: linear-gradient(to bottom, #ff3d7f, #cc0052);
-      border-radius: 0 0 12px 12px;
-      box-shadow: 0 0 15px rgba(255,61,127,0.8);
-    }
-    .status {
-      position: absolute;
-      bottom: 25px;
-      background: rgba(30,30,50,0.9);
-      color: #00ffcc;
-      padding: 8px 20px;
-      border-radius: 30px;
-      font-size: 0.95rem;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      opacity: 0;
-      transform: translateY(10px);
-      transition: all 0.4s ease;
-    }
-    .status.show {
-      opacity: 1;
-      transform: translateY(0);
-    }
-    .unlock-layer {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: transparent;
-      z-index: 1000;
-      cursor: pointer;
-    }
-    @keyframes bounce {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-12px); }
-    }
-    @keyframes pulse {
-      0%, 100% { box-shadow: 0 0 10px #ff3d7f, 0 0 20px #ff3d7f; }
-      50% { box-shadow: 0 0 15px #ff3d7f, 0 0 25px #ff3d7f; }
-    }
-    @media (max-width: 375px) {
-      .name { font-size: 2.4rem; }
-      .robot { width: 170px; height: 170px; }
-      .head { width: 135px; height: 135px; }
-      .eye { width: 30px; height: 30px; }
-      .mouth { width: 55px; height: 18px; }
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-width=1.0">
+    
+    <!-- Meta Tag untuk Share di WhatsApp -->
+    <title>Kaka Music Game Studio Playlist</title>
+    <meta property="og:title" content="Dengarkan Lagu Terbaru - Kaka Music Game Studio">
+    <meta property="og:description" content="Koleksi lagu gaming terbaik dan soundtrack eksklusif. Dengerin sekarang!">
+    <meta property="og:image" content="https://via.placeholder.com/600x600/000000/FFFFFF?text=Kaka+Music+Studio"> 
+    <meta property="og:type" content="music.song">
+    <meta name="theme-color" content="#0f0f1a">
+
+    <style>
+        /* --- RESET & BASIC SETUP --- */
+        :root {
+            --primary: #00e5ff; /* Cyan Neon */
+            --secondary: #ff0055; /* Pink Neon */
+            --bg-dark: #0f0f1a;
+            --bg-card: #1a1a2e;
+            --text-main: #ffffff;
+            --text-muted: #8888aa;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none; /* Mencegah seleksi teks agar terasa seperti aplikasi */
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            background: radial-gradient(circle at 50% -20%, #2a2a4a, var(--bg-dark));
+        }
+
+        /* --- BACKGROUND ANIMATION --- */
+        .bg-particles {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+        
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: var(--primary);
+            border-radius: 50%;
+            opacity: 0.5;
+            animation: float 10s infinite linear;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(100vh) translateX(0); opacity: 0; }
+            50% { opacity: 0.8; }
+            100% { transform: translateY(-10vh) translateX(20px); opacity: 0; }
+        }
+
+        /* --- MAIN CONTAINER --- */
+        .player-container {
+            width: 90%;
+            max-width: 400px;
+            background: rgba(26, 26, 46, 0.85);
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+            position: relative;
+        }
+
+        /* Header */
+        .header {
+            margin-bottom: 20px;
+        }
+        .header h1 {
+            font-size: 1.2rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 800;
+        }
+
+        /* Cover Art */
+        .cover-wrapper {
+            width: 100%;
+            aspect-ratio: 1/1;
+            border-radius: 15px;
+            overflow: hidden;
+            margin-bottom: 25px;
+            box-shadow: 0 8px 20px rgba(0, 229, 255, 0.2);
+            position: relative;
+        }
+
+        .cover-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .cover-wrapper:hover .cover-img {
+            transform: scale(1.05);
+        }
+
+        /* Song Info */
+        .song-info {
+            margin-bottom: 20px;
+        }
+        .song-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .artist-name {
+            font-size: 0.9rem;
+            color: var(--primary);
+            margin-bottom: 2px;
+        }
+        .album-name {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            width: 100%;
+            height: 5px;
+            background: #33334d;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            position: relative;
+        }
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            border-radius: 5px;
+            width: 0%;
+            position: relative;
+        }
+        .time-stamps {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-bottom: 20px;
+        }
+
+        /* Controls */
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+        }
+
+        .btn {
+            background: none;
+            border: none;
+            color: var(--text-main);
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn:hover {
+            color: var(--primary);
+            transform: scale(1.1);
+        }
+
+        .btn-main {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            box-shadow: 0 0 15px rgba(0, 229, 255, 0.4);
+            font-size: 24px;
+            color: #000;
+        }
+        
+        .btn-main:hover {
+            color: #000; /* Tetap hitam karena icon play/pause */
+            box-shadow: 0 0 25px rgba(255, 0, 85, 0.6);
+        }
+
+        /* Playlist List (Hidden by default on mobile, toggleable) */
+        .playlist-toggle {
+            margin-top: 20px;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            text-decoration: underline;
+            cursor: pointer;
+        }
+
+        .playlist-box {
+            max-height: 0;
+            overflow-y: auto;
+            transition: max-height 0.3s ease;
+            margin-top: 10px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .playlist-box.open {
+            max-height: 200px;
+            padding-top: 10px;
+        }
+
+        .playlist-item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: background 0.2s;
+        }
+        
+        .playlist-item:hover {
+            background: rgba(255,255,255,0.05);
+        }
+
+        .playlist-item.active {
+            background: rgba(0, 229, 255, 0.1);
+            border-left: 3px solid var(--primary);
+        }
+
+        .item-thumb {
+            width: 40px;
+            height: 40px;
+            border-radius: 4px;
+            margin-right: 10px;
+            object-fit: cover;
+        }
+        
+        .item-info {
+            text-align: left;
+            flex: 1;
+        }
+        
+        .item-title {
+            font-size: 0.9rem;
+            color: var(--text-main);
+        }
+        
+        .item-artist {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        /* SVG Icons */
+        svg {
+            width: 24px;
+            height: 24px;
+            fill: currentColor;
+        }
+        .btn-main svg {
+            width: 28px;
+            height: 28px;
+        }
+
+    </style>
 </head>
 <body>
-  <div class="unlock-layer" id="unlockLayer"></div>
-  
-  <div class="studio">
-    <h1 class="name">KAKA</h1>
-    <div class="subtitle">MUSIC STUDIO</div>
-    
-    <div class="robot">
-      <div class="antenna"></div>
-      <div class="antenna-tip"></div>
-      <div class="head">
-        <div class="eye left"></div>
-        <div class="eye right"></div>
-        <div class="mouth" id="mouth"></div>
-      </div>
-    </div>
-    
-    <div class="status" id="status">
-      <span>🔊 Robot voice active</span>
-    </div>
-  </div>
 
-  <script>
-    let audioContext;
-    let audioBuffer;
-    let isAudioUnlocked = false;
-    const unlockLayer = document.getElementById('unlockLayer');
-    const status = document.getElementById('status');
-    const mouth = document.getElementById('mouth');
-    const audioUrl = 'welcome-robot.mp3';
-    
-    window.addEventListener('load', init);
-    
-    function init() {
-      if (localStorage.getItem('kaka_audio_unlocked') === 'true') {
-        playAudio();
-        hideUnlockLayer();
-        return;
-      }
-      
-      unlockLayer.addEventListener('touchstart', unlockAndPlay, { passive: true, once: true });
-      unlockLayer.addEventListener('click', unlockAndPlay, { once: true });
-    }
-    
-    function playAudio() {
-      const audio = new Audio(audioUrl);
-      audio.volume = 0.9;
-      audio.loop = true;
-      audio.play().then(() => {
-        isAudioUnlocked = true;
-        localStorage.setItem('kaka_audio_unlocked', 'true');
-        status.classList.add('show');
-        animateMouth();
-      }).catch(e => console.warn('Audio play failed:', e));
-    }
-    
-    function unlockAndPlay(e) {
-      e.preventDefault();
-      e.stopPropagation();
-      playAudio();
-      hideUnlockLayer();
-    }
-    
-    function hideUnlockLayer() {
-      unlockLayer.style.display = 'none';
-      unlockLayer.style.pointerEvents = 'none';
-    }
-    
-    function animateMouth() {
-      let open = false;
-      setInterval(() => {
-        mouth.style.height = open ? '25px' : '15px';
-        open = !open;
-      }, 120);
-    }
-  </script>
+    <!-- Background Particles -->
+    <div class="bg-particles" id="particles"></div>
+
+    <div class="player-container">
+        <div class="header">
+            <h1>Kaka Studio</h1>
+        </div>
+
+        <!-- Cover Image -->
+        <div class="cover-wrapper">
+            <img src="" alt="Album Art" class="cover-img" id="cover">
+        </div>
+
+        <!-- Song Info -->
+        <div class="song-info">
+            <div class="song-title" id="title">Loading...</div>
+            <div class="artist-name" id="artist">Artist</div>
+            <div class="album-name" id="album">Album</div>
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="progress-container" id="progress-container">
+            <div class="progress-bar" id="progress"></div>
+        </div>
+        <div class="time-stamps">
+            <span id="curr-time">0:00</span>
+            <span id="dur-time">0:00</span>
+        </div>
+
+        <!-- Controls -->
+        <div class="controls">
+            <!-- Prev -->
+            <button class="btn" id="prev">
+                <svg viewBox="0 0 24 24"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>
+            </button>
+
+            <!-- Play/Pause -->
+            <button class="btn btn-main" id="play">
+                <!-- Play Icon -->
+                <svg id="play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                <!-- Pause Icon (Hidden default) -->
+                <svg id="pause-icon" viewBox="0 0 24 24" style="display:none"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+            </button>
+
+            <!-- Next -->
+            <button class="btn" id="next">
+                <svg viewBox="0 0 24 24"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
+            </button>
+        </div>
+
+        <!-- Playlist Toggle -->
+        <div class="playlist-toggle" onclick="togglePlaylist()">Lihat Daftar Lagu ▼</div>
+        <div class="playlist-box" id="playlist-box">
+            <!-- Items injected by JS -->
+        </div>
+    </div>
+
+    <script>
+        // --- KONFIGURASI LAGU ---
+        // Ganti URL di bawah ini dengan link MP3 dan Foto Kamu
+        // Contoh untuk GitHub: "./lagu1.mp3" atau link eksternal (pastikan CORS diizinkan)
+        
+        const songs = [
+            {
+                title: "Battle of the Ancients",
+                artist: "Kaka Composer",
+                album: "Epic Soundtrack Vol. 1",
+                cover: "https://picsum.photos/seed/game1/300/300", // Ganti dengan foto lagu kamu
+                src: "welcome-robot.mp3" // Contoh link mp3 online
+            },
+            {
+                title: "Neon City Night",
+                artist: "Cyber Band",
+                album: "Synthwave Collection",
+                cover: "https://picsum.photos/seed/game2/300/300",
+                src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3"
+            },
+            {
+                title: "Puzzle Theme",
+                artist: "Studio Orchestra",
+                album: "Casual Games",
+                cover: "https://picsum.photos/seed/game3/300/300",
+                src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3"
+            }
+        ];
+
+        // --- DOM ELEMENTS ---
+        const cover = document.getElementById('cover');
+        const title = document.getElementById('title');
+        const artist = document.getElementById('artist');
+        const album = document.getElementById('album');
+        
+        const progressContainer = document.getElementById('progress-container');
+        const progressBar = document.getElementById('progress');
+        const currTime = document.getElementById('curr-time');
+        const durTime = document.getElementById('dur-time');
+
+        const playBtn = document.getElementById('play');
+        const prevBtn = document.getElementById('prev');
+        const nextBtn = document.getElementById('next');
+        
+        const playIcon = document.getElementById('play-icon');
+        const pauseIcon = document.getElementById('pause-icon');
+        
+        const playlistBox = document.getElementById('playlist-box');
+
+        let songIndex = 0;
+        let isPlaying = false;
+
+        // Audio Object
+        const audio = new Audio();
+        
+        // --- INIT ---
+        loadSong(songs[songIndex]);
+
+        // --- FUNCTIONS ---
+
+        function loadSong(song) {
+            title.innerText = song.title;
+            artist.innerText = song.artist;
+            album.innerText = song.album;
+            cover.src = song.cover;
+            audio.src = song.src;
+            updatePlaylistUI();
+        }
+
+        function playSong() {
+            isPlaying = true;
+            audio.play().catch(e => console.log("Autoplay blocked, interaction needed first"));
+            playIcon.style.display = 'none';
+            pauseIcon.style.display = 'block';
+            cover.style.transform = "scale(1.05)"; // Efek membesar
+        }
+
+        function pauseSong() {
+            isPlaying = false;
+            audio.pause();
+            playIcon.style.display = 'block';
+            pauseIcon.style.display = 'none';
+            cover.style.transform = "scale(1)";
+        }
+
+        function prevSong() {
+            songIndex--;
+            if (songIndex < 0) {
+                songIndex = songs.length - 1;
+            }
+            loadSong(songs[songIndex]);
+            if(isPlaying) playSong();
+        }
+
+        function nextSong() {
+            songIndex++;
+            if (songIndex > songs.length - 1) {
+                songIndex = 0;
+            }
+            loadSong(songs[songIndex]);
+            if(isPlaying) playSong();
+        }
+
+        function updateProgress(e) {
+            const { duration, currentTime } = e.srcElement;
+            if (isNaN(duration)) return;
+            const progressPercent = (currentTime / duration) * 100;
+            progressBar.style.width = `${progressPercent}%`;
+
+            // Time formatting
+            const currentMin = Math.floor(currentTime / 60);
+            let currentSec = Math.floor(currentTime % 60);
+            if (currentSec < 10) currentSec = `0${currentSec}`;
+            
+            const durationMin = Math.floor(duration / 60);
+            let durationSec = Math.floor(duration % 60);
+            if (durationSec < 10) durationSec = `0${durationSec}`;
+
+            currTime.innerText = `${currentMin}:${currentSec}`;
+            durTime.innerText = `${durationMin}:${durationSec}`;
+        }
+
+        function setProgress(e) {
+            const width = this.clientWidth;
+            const clickX = e.offsetX;
+            const duration = audio.duration;
+            audio.currentTime = (clickX / width) * duration;
+        }
+
+        // Generate Playlist UI
+        function generatePlaylist() {
+            playlistBox.innerHTML = '';
+            songs.forEach((song, index) => {
+                const item = document.createElement('div');
+                item.classList.add('playlist-item');
+                if(index === songIndex) item.classList.add('active');
+                
+                item.innerHTML = `
+                    <img src="${song.cover}" class="item-thumb">
+                    <div class="item-info">
+                        <div class="item-title">${song.title}</div>
+                        <div class="item-artist">${song.artist}</div>
+                    </div>
+                `;
+                
+                item.addEventListener('click', () => {
+                    songIndex = index;
+                    loadSong(songs[songIndex]);
+                    playSong();
+                });
+                
+                playlistBox.appendChild(item);
+            });
+        }
+
+        function updatePlaylistUI() {
+            const items = document.querySelectorAll('.playlist-item');
+            items.forEach((item, index) => {
+                if(index === songIndex) item.classList.add('active');
+                else item.classList.remove('active');
+            });
+        }
+
+        function togglePlaylist() {
+            playlistBox.classList.toggle('open');
+        }
+
+        // --- EVENTS ---
+        playBtn.addEventListener('click', () => {
+            if (isPlaying) {
+                pauseSong();
+            } else {
+                playSong();
+            }
+        });
+
+        prevBtn.addEventListener('click', prevSong);
+        nextBtn.addEventListener('click', nextSong);
+
+        audio.addEventListener('timeupdate', updateProgress);
+        audio.addEventListener('ended', nextSong);
+        
+        progressContainer.addEventListener('click', setProgress);
+
+        // --- BACKGROUND PARTICLES GENERATOR ---
+        const particlesContainer = document.getElementById('particles');
+        for (let i = 0; i < 20; i++) {
+            const p = document.createElement('div');
+            p.classList.add('particle');
+            p.style.left = Math.random() * 100 + '%';
+            p.style.animationDuration = (Math.random() * 10 + 5) + 's';
+            p.style.animationDelay = Math.random() * 5 + 's';
+            particlesContainer.appendChild(p);
+        }
+
+        // Jalankan playlist
+        generatePlaylist();
+        
+        // Auto Play Attempt (Browser modern mungkin memblokir ini sampai user klik)
+        window.addEventListener('load', () => {
+             // Kita coba play, tapi jika gagal, user harus klik tombol play manual
+             // playSong(); 
+             console.log("Music Player Ready");
+        });
+
+    </script>
 </body>
 </html>
