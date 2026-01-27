@@ -235,7 +235,7 @@
         }
         
         .playlist-item:hover {
-            background: rgba(255,255,255,0.05);
+            background: rgba(255,255,white:0.05);
         }
 
         .playlist-item.active {
@@ -536,11 +536,18 @@
         // Jalankan playlist
         generatePlaylist();
         
-        // Auto Play Attempt (Browser modern mungkin memblokir ini sampai user klik)
+        // --- AUTO PLAY LOGIC ---
         window.addEventListener('load', () => {
-             // Kita coba play, tapi jika gagal, user harus klik tombol play manual
-             // playSong(); 
-             console.log("Music Player Ready");
+             // Coba langsung memainkan lagu saat halaman dimuat
+             audio.play().then(() => {
+                 isPlaying = true;
+                 playIcon.style.display = 'none';
+                 pauseIcon.style.display = 'block';
+                 cover.style.transform = "scale(1.05)";
+                 console.log("Auto Play Berhasil!");
+             }).catch(error => {
+                 console.log("Autoplay diblokir browser, perlu interaksi user.");
+             });
         });
 
     </script>
