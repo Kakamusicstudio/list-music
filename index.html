@@ -23,11 +23,9 @@
             justify-content: center;
             align-items: center;
             overflow: hidden;
-            /* Background gradient halus */
             background: radial-gradient(circle at 50% -20%, #2a2a2a, #000000 80%);
         }
 
-        /* --- CONTAINER UTAMA (GLASSMORPHISM) --- */
         .player-card {
             position: relative;
             width: 380px;
@@ -42,12 +40,11 @@
             align-items: center;
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8);
             transform-style: preserve-3d;
-            transition: transform 0.1s ease-out; /* Untuk efek tilt halus */
+            transition: transform 0.1s ease-out;
             color: white;
             z-index: 10;
         }
 
-        /* --- ALBUM ART --- */
         .art-container {
             width: 260px;
             height: 260px;
@@ -56,7 +53,7 @@
             box-shadow: 0 20px 40px rgba(0,0,0,0.6);
             margin-bottom: 35px;
             position: relative;
-            transform: translateZ(20px); /* Efek pop-out 3D halus */
+            transform: translateZ(20px);
         }
 
         .album-art {
@@ -70,7 +67,6 @@
             transform: scale(1.05);
         }
 
-        /* --- TEKS INFO --- */
         .info {
             text-align: center;
             margin-bottom: 30px;
@@ -90,7 +86,6 @@
             color: rgba(255, 255, 255, 0.6);
         }
 
-        /* --- VISUALIZER (BAR BAWAH) --- */
         .visualizer-container {
             width: 100%;
             height: 30px;
@@ -107,11 +102,10 @@
             width: 4px;
             background: #fff;
             border-radius: 2px;
-            height: 5px; /* Default height */
+            height: 5px;
             transition: height 0.1s ease;
         }
 
-        /* --- PROGRESS BAR --- */
         .progress-wrapper {
             width: 100%;
             margin-bottom: 25px;
@@ -144,7 +138,6 @@
             font-weight: 500;
         }
 
-        /* --- CONTROLS --- */
         .controls {
             display: flex;
             justify-content: space-between;
@@ -183,7 +176,6 @@
             background: #f0f0f0;
         }
 
-        /* --- OVERLAY START --- */
         #start-overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -215,7 +207,6 @@
             box-shadow: 0 0 30px rgba(255,255,255,0.4);
         }
 
-        /* --- PLAYLIST KECIL --- */
         .playlist {
             position: absolute;
             bottom: 30px;
@@ -251,38 +242,31 @@
         .track-row:hover { color: #fff; }
         .track-row.active { color: #fff; font-weight: 600; }
 
-        /* Scrollbar halus */
         ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-thumb { background: #333; border-radius: 2px; }
     </style>
 </head>
 <body>
 
-    <!-- Tombol Awal (Wajib untuk Autoplay) -->
+    <!-- Tombol Awal -->
     <div id="start-overlay">
         <h2 style="color:white; margin-bottom:20px; font-weight:300;">MUSIC PLAYER</h2>
         <button class="btn-start" onclick="startApp()">TAP TO PLAY</button>
     </div>
 
-    <!-- Kartu Player Utama -->
+    <!-- Kartu Player -->
     <div class="player-card" id="card">
-        <!-- Album Art -->
         <div class="art-container">
             <img src="https://picsum.photos/seed/music/500/500" class="album-art" id="cover-img">
         </div>
 
-        <!-- Info -->
         <div class="info">
             <div class="title" id="song-title">Song Title</div>
             <div class="artist" id="song-artist">Artist Name</div>
         </div>
 
-        <!-- Visualizer Bar Kecil -->
-        <div class="visualizer-container" id="visualizer">
-            <!-- Javascript akan buat bar-bar disini -->
-        </div>
+        <div class="visualizer-container" id="visualizer"></div>
 
-        <!-- Progress -->
         <div class="progress-wrapper" id="progress-area">
             <div class="progress-bg">
                 <div class="progress-fill" id="progress-fill"></div>
@@ -293,7 +277,6 @@
             </div>
         </div>
 
-        <!-- Tombol -->
         <div class="controls">
             <button class="btn" onclick="prevTrack()">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>
@@ -315,42 +298,42 @@
     </div>
 
     <script>
-        // --- DATA LAGU (GANTI LINKNYA DISINI) ---
+        // --- DATA LAGU ---
+        // PASTIKAN NAMA FILE DISINI SAMA PERSIS DENGAN FILE DI FOLDER KAMU!
         const tracks = [
             {
                 title: "Bendera Setengah Tiang",
                 artist: "Slank",
                 cover: "https://picsum.photos/seed/slank1/500/500",
-                src: "robot penyambut tamu.mp3" // GANTI LINK
+                src: "robot penyambut tamu.mp3" 
             },
             {
                 title: "Slalom",
                 artist: "Slank",
                 cover: "https://picsum.photos/seed/slank2/500/500",
-                src: "robot penyambut tamu.mp3" // GANTI LINK
+                src: "robot penyambut tamu.mp3"
             },
             {
                 title: "Juwita",
                 artist: "Slank",
                 cover: "https://picsum.photos/seed/slank3/500/500",
-                src: "robot penyambut tamu.mp3.mp3" // GANTI LINK
+                // Saya PERBAIKI typo .mp3.mp3 jadi .mp3 saja
+                src: "robot penyambut tamu.mp3" 
             },
             {
                 title: "Gak Welcome",
                 artist: "Slank",
                 cover: "https://picsum.photos/seed/slank4/500/500",
-                src: "robot penyambut tamu.mp3" // GANTI LINK
+                src: "robot penyambut tamu.mp3"
             }
         ];
 
-        // --- LOGIC ---
         let audio = new Audio();
         audio.crossOrigin = "anonymous";
         let currentIdx = 0;
         let isPlaying = false;
         let analyser, dataArray;
         
-        // DOM Elements
         const titleEl = document.getElementById('song-title');
         const artistEl = document.getElementById('song-artist');
         const coverEl = document.getElementById('cover-img');
@@ -372,8 +355,13 @@
         }
         const bars = document.querySelectorAll('.bar');
 
+        // --- TAMBAHAN DETEKSI ERROR ---
+        audio.addEventListener('error', function(e) {
+            console.error("Audio Error:", e);
+            alert("GA BISA PLAY!\n\nNama file: " + audio.src + "\n\nPastikan file MP3 ada di folder yang sama dengan file HTML ini, dan penulisannya sama persis (Huruf Besar/Kecil berpengaruh).");
+        });
+
         function startApp() {
-            // Setup Audio Context
             const AudioContext = window.AudioContext || window.webkitAudioContext;
             const audioCtx = new AudioContext();
             analyser = audioCtx.createAnalyser();
@@ -383,12 +371,11 @@
             analyser.fftSize = 64;
             dataArray = new Uint8Array(analyser.frequencyBinCount);
 
-            // Hapus overlay
             document.getElementById('start-overlay').style.opacity = '0';
             setTimeout(() => document.getElementById('start-overlay').style.display = 'none', 600);
 
-            // Render Playlist
             const plContainer = document.getElementById('playlist-items');
+            plContainer.innerHTML = ''; // Reset
             tracks.forEach((t, i) => {
                 let row = document.createElement('div');
                 row.className = 'track-row';
@@ -398,10 +385,8 @@
                 plContainer.appendChild(row);
             });
 
-            // Load lagu pertama dan Auto Play
             loadTrack(0);
             playSong();
-            
             animateVisualizer();
         }
 
@@ -413,17 +398,23 @@
             artistEl.innerText = t.artist;
             coverEl.src = t.cover;
 
-            // Update Playlist UI
             document.querySelectorAll('.track-row').forEach((el, i) => {
                 el.classList.toggle('active', i === index);
             });
         }
 
         function playSong() {
-            audio.play();
-            isPlaying = true;
-            playBtnIcon.style.display = 'none';
-            pauseBtnIcon.style.display = 'block';
+            var playPromise = audio.play();
+            if (playPromise !== undefined) {
+                playPromise.then(_ => {
+                    isPlaying = true;
+                    playBtnIcon.style.display = 'none';
+                    pauseBtnIcon.style.display = 'block';
+                })
+                .catch(error => {
+                    console.log("Autoplay dicegah browser, coba klik manual.");
+                });
+            }
         }
 
         function pauseSong() {
@@ -452,22 +443,17 @@
             playSong();
         }
 
-        // Auto Next logic
         audio.addEventListener('ended', nextTrack);
 
-        // Update Progress
         audio.addEventListener('timeupdate', () => {
             const { duration, currentTime } = audio;
             if(isNaN(duration)) return;
-            
             const progressPercent = (currentTime / duration) * 100;
             progressFill.style.width = `${progressPercent}%`;
-            
             currTimeEl.innerText = formatTime(currentTime);
             durTimeEl.innerText = formatTime(duration);
         });
 
-        // Click to Seek
         progressArea.addEventListener('click', (e) => {
             const width = progressArea.clientWidth;
             const clickX = e.offsetX;
@@ -481,35 +467,24 @@
             return `${min}:${sec}`;
         }
 
-        // Visualizer Animation
         function animateVisualizer() {
             requestAnimationFrame(animateVisualizer);
             if(!analyser) return;
-            
             analyser.getByteFrequencyData(dataArray);
-            
-            // Mapping data ke bar
             for(let i=0; i<barCount; i++) {
-                // Ambil data freq yang relevan
                 const val = dataArray[i]; 
-                // Scale height (max 30px)
                 const height = Math.max(4, (val / 255) * 25); 
                 bars[i].style.height = `${height}px`;
-                
-                // Ganti opacity biar smooth
                 bars[i].style.opacity = 0.5 + (val/255)*0.5;
             }
         }
 
-        // --- 3D TILT EFFECT (SUBTLE) ---
         document.addEventListener('mousemove', (e) => {
             const x = (window.innerWidth / 2 - e.pageX) / 40;
             const y = (window.innerHeight / 2 - e.pageY) / 40;
-            
             card.style.transform = `rotateY(${x}deg) rotateX(${y}deg)`;
         });
 
-        // Reset posisi saat mouse keluar
         document.addEventListener('mouseleave', () => {
             card.style.transform = `rotateY(0deg) rotateX(0deg)`;
         });
